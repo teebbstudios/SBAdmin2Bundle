@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    {% block meta_tags %}
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    {% endblock %}
+    {% block seo_meta_tags %}
+        <meta name="description" content="">
+        <meta name="author" content="">
+    {% endblock %}
+    <title>
+        {% block teebb_head_title %}
+            {{ 'TeebbSBAdmin2'|trans({}, 'TeebbSBAdmin2Bundle') }}
+
+
+        {% endblock %}
+    </title>
+
+    {% block stylesheets %}
+        <!-- Custom fonts for this template-->
+        <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+              rel="stylesheet">
+
+        {% for stylesheet in teebb_sbadmin2.SBAdmin2Config.getOption('stylesheets', []) %}
+            <link rel="stylesheet" href="{{ asset(stylesheet) }}">
+        {% endfor %}
+    {% endblock %}
+
+    <link href="{{ asset( teebb_sbadmin2.SBAdmin2Config.favicon ) }}" rel="shortcut icon">
+
+</head>
+
+<body id="page-top">
+
+<!-- Page Wrapper -->
+{% block teebb_wrapper %}
+<div id="wrapper">
+
+    {% block teebb_header_noscript_warning %}
+        <noscript>
+            <div class="noscript-warning fixed-top text-center bg-danger text-dark">
+                {{ 'noscript_warning'|trans({}, 'TeebbSBAdmin2Bundle') }}
+            </div>
+        </noscript>
+    {% endblock %}
+
+    <!-- Sidebar -->
+    {% block teebb_left_side %}
+    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+        <!-- Sidebar - Brand -->
+        {% block logo %}
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+            {% if 'single_image' == teebb_sbadmin2.SBAdmin2Config.getOption('logo_mode') or 'both' == teebb_sbadmin2.SBAdmin2Config.getOption('logo_mode') %}
+                <div class="sidebar-brand-icon{% if 'both' == teebb_sbadmin2.SBAdmin2Config.getOption('logo_mode') %} mr-2{% endif %}">
+                    <img src="{{ asset(teebb_sbadmin2.SBAdmin2Config.siteLogo) }}" alt="{{ teebb_sbadmin2.SBAdmin2Config.siteName }}">
+                </div>
+            {% endif %}
+            {% if 'single_text' == teebb_sbadmin2.SBAdmin2Config.getOption('logo_mode') or 'both' == teebb_sbadmin2.SBAdmin2Config.getOption('logo_mode') %}
+                <div class="sidebar-brand-text">
+                    {{ teebb_sbadmin2.SBAdmin2Config.siteName|raw }}
+                </div>
+            {% endif %}
+        </a>
+        {% endblock %}
+        <!-- Divider -->
+        <hr class="sidebar-divider my-0">
+
+        <!-- Nav Item - Dashboard -->
+        <li class="nav-item active">
+            <a class="nav-link" href="index.html">
+                <i class="fas fa-fw fa-tachometer-alt"></i>
+                <span>{{ 'Dashboard'|trans({}, 'TeebbSBAdmin2Bundle') }}</span>
+            </a>
+        </li>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider">
+
+        {% block side_bar_before_nav %}
+        {% endblock %}
+
+        {% block side_bar_nav %}
+            {#{{ knp_menu_render('teebb_sbadmin2_sidebar', {template: get_global_template('knp_menu_template')}) }}#}
+        {% endblock side_bar_nav %}
+
+        {% block side_bar_after_nav %}
+        {% endblock %}
+
+        <!-- Sidebar Toggler (Sidebar) -->
+        <div class="text-center d-none d-md-inline">
+            <button class="rounded-circle border-0" id="sidebarToggle"></button>
+        </div>
+
+    </ul>
+    {% endblock teebb_left_side %}
+    <!-- End of Sidebar -->
+
+    <!-- Content Wrapper -->
+    <div id="content-wrapper" class="d-flex flex-column">
+
+        <!-- Main Content -->
+        <div id="content">
+
+            {% block teebb_topbar %}
+            <!-- Topbar -->
+            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+
+                <!-- Sidebar Toggle (Topbar) -->
+                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                    <i class="fa fa-bars"></i>
+                </button>
+
+                <!--Breadcrumb-->
+                {% block teebb_breadcrumb %}
+                <nav aria-label="breadcrumb" class="d-none d-md-block">
+                    {#{% if _breadcrumb is not empty or action is defined %}#}
+                    {#<ol class="breadcrumb">#}
+                        {#{% if _breadcrumb is empty %}#}
+                            {#{% if action is defined %}#}
+                                {#{% for menu in breadcrumbs_builder.breadcrumbs(admin, action) %}#}
+                                    {#{%- set translation_domain = menu.extra('translation_domain', 'messages') -%}#}
+                                    {#{%- set label = menu.label -%}#}
+                                    {#{%- if translation_domain is not same as(false) -%}#}
+                                        {#{%- set label = label|trans(menu.extra('translation_params', {}), translation_domain) -%}#}
+                                    {#{%- endif -%}#}
+
+                                    {#{% if not loop.last %}#}
+                                        {#<li>#}
+                                            {#{% if menu.uri is not empty %}#}
+                                                {#<a href="{{ menu.uri }}">#}
+                                                    {#{% if menu.extra('safe_label', true) %}#}
+                                                        {#{{- label|raw -}}#}
+                                                    {#{% else %}#}
+                                                        {#{{- label -}}#}
+                                                    {#{% endif %}#}
+                                                {#</a>#}
+                                            {#{% else %}#}
+                                                {#<span>{{ label }}</span>#}
+                                            {#{% endif %}#}
+                                        {#</li>#}
+                                    {#{% else %}#}
+                                        {#<li class="active"><span>{{ label }}</span></li>#}
+                                    {#{% endif %}#}
+                                {#{% endfor %}#}
+                            {#{% endif %}#}
+                        {#{% else %}#}
+                            {#{{ _breadcrumb|raw }}#}
+                        {#{% endif %}#}
+                        {#<li class="breadcrumb-item"><a href="#"><i class="fas fa-home"></i></a></li>#}
+                    {#</ol>#}
+                    {#{% endif %}#}
+                </nav>
+                {% endblock %}
+
+                <!-- Topbar Navbar -->
+                <ul class="navbar-nav ml-auto">
+
+                    <!-- Topbar Search -->
+                    {% block teebb_topbar_search %}
+                        {% if teebb_sbadmin2.SBAdmin2Config.getOption('search') %}
+                        <li class="nav-item m-auto mx-1">
+                            <form class="d-none d-lg-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                                <div class="input-group">
+                                    <input type="text" class="form-control bg-light border-0 small" placeholder="{{ 'search_placeholder'|trans({}, 'TeebbSBAdmin2Bundle') }}"
+                                           aria-label="Search" aria-describedby="basic-addon2">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="button">
+                                            <i class="fas fa-search fa-sm"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </li>
+
+                        <!-- Nav Item - Search Dropdown (Visible Down lg) -->
+                        <li class="nav-item dropdown no-arrow d-lg-none">
+                            <a class="nav-link dropdown-toggle" href="#" id="searchDropdown" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-search fa-fw"></i>
+                            </a>
+                            <!-- Dropdown - Messages -->
+                            <div class="dropdown-menu dropdown-menu-search dropdown-search dropdown-menu-right p-3 shadow animated--grow-in"
+                                 aria-labelledby="searchDropdown">
+                                <form class="form-inline mr-auto w-100 navbar-search">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control bg-light border-0 small"
+                                               placeholder="{{ 'search_placeholder'|trans({}, 'TeebbSBAdmin2Bundle') }}" aria-label="Search"
+                                               aria-describedby="basic-addon2">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-primary" type="button">
+                                                <i class="fas fa-search fa-sm"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </li>
+                        {% endif %}
+                    {% endblock teebb_topbar_search %}
+
+                    <!-- Nav Item - Alerts -->
+                    {% block teebb_topbar_alert %}
+                        {% if teebb_sbadmin2.SBAdmin2Config.getOption('alert') %}
+                        <li class="nav-item dropdown no-arrow mx-1">
+                            <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-bell fa-fw"></i>
+                                <!-- Counter - Alerts -->
+                                <span class="badge badge-danger badge-counter">3+</span>
+                            </a>
+                            <!-- Dropdown - Alerts -->
+                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                 aria-labelledby="alertsDropdown">
+                                <h6 class="dropdown-header">
+                                    Alerts Center
+                                </h6>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="mr-3">
+                                        <div class="icon-circle bg-primary">
+                                            <i class="fas fa-file-alt text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="small text-gray-500">December 12, 2019</div>
+                                        <span class="font-weight-bold">A new monthly report is ready to download!</span>
+                                    </div>
+                                </a>
+                            </div>
+                        </li>
+                        {% endif %}
+                    {% endblock %}
+
+                    <!-- Nav Item - Messages -->
+                    {% block teebb_topbar_messages %}
+                        {% if teebb_sbadmin2.SBAdmin2Config.getOption('messages') %}
+                        <li class="nav-item dropdown no-arrow mx-1">
+                            <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-envelope fa-fw"></i>
+                                <!-- Counter - Messages -->
+                                <span class="badge badge-danger badge-counter">7</span>
+                            </a>
+                            <!-- Dropdown - Messages -->
+                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                 aria-labelledby="messagesDropdown">
+                                <h6 class="dropdown-header">
+                                    Message Center
+                                </h6>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="dropdown-list-image mr-3">
+                                        <img class="rounded-circle" src="https://source.unsplash.com/fn_BT9fwg_E/60x60"
+                                             alt="">
+                                        <div class="status-indicator bg-success"></div>
+                                    </div>
+                                    <div class="font-weight-bold">
+                                        <div class="text-truncate">Hi there! I am wondering if you can help me with a
+                                            problem I've been having.
+                                        </div>
+                                        <div class="small text-gray-500">Emily Fowler · 58m</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </li>
+                        {% endif %}
+                    {% endblock %}
+
+                    <div class="topbar-divider d-none d-sm-block"></div>
+
+                    <!-- Nav Item - User Information -->
+                    {% block teebb_topbar_user %}
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Valerie Luna</span>
+                                <img class="img-profile rounded-circle" src="https://source.unsplash.com/QAB-WJcbgJk/60x60">
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                 aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-500"></i>
+                                    个人资料
+                                </a>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-500"></i>
+                                    操作日志
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-500"></i>
+                                    退出
+                                </a>
+                            </div>
+                        </li>
+                    {% endblock %}
+
+                </ul>
+
+            </nav>
+            <!-- End of Topbar -->
+            {% endblock teebb_topbar %}
+
+            {% block teebb_page_content %}
+            <!-- Begin Page Content -->
+            <div class="container-fluid">
+
+                {% block teebb_content_heading %}
+                <!-- Page Heading -->
+                <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                    <h1 class="h3 mb-0 text-gray-800">控制台</h1>
+                    <a href="select-content-type.html" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                                class="fas fa-plus-circle fa-sm text-white-50 pr-2"></i>添加内容</a>
+                </div>
+                {% endblock teebb_content_heading%}
+
+                <!-- FULL WIDTH Content -->
+                <div class="full-width-wrapper">
+                    {% block notice %}
+                        {#{% include '@SonataCore/FlashMessage/render.html.twig' %}#}
+                    {% endblock notice %}
+
+
+                </div>
+
+            </div>
+            <!-- /.container-fluid -->
+            {% endblock teebb_page_content %}
+
+        </div>
+        <!-- End of Main Content -->
+
+        {% block teebb_footer %}
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+            <div class="container my-auto">
+                <div class="copyright text-center my-auto">
+                    <span>Copyright &copy; Teebb Studios 2019</span>
+                </div>
+            </div>
+        </footer>
+        <!-- End of Footer -->
+        {% endblock %}
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+</div>
+<!-- End of Page Wrapper -->
+{% endblock teebb_wrapper %}
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+</a>
+
+{% block javascripts %}
+    {% block teebb_javascripts_before %}
+    {% endblock %}
+
+    {% block teebb_javascripts %}
+        {% for javascript in teebb_sbadmin2.SBAdmin2Config.getOption('javascripts', []) %}
+        <script src="{{ asset(javascript) }}"></script>
+        {% endfor %}
+    {% endblock %}
+
+    {% block teebb_javascripts_after %}
+    {% endblock %}
+
+{% endblock %}
+
+
+
+</body>
+
+</html>

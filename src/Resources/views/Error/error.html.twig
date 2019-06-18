@@ -1,0 +1,21 @@
+{% extends '@TeebbSBAdmin2/standard_layout.html.twig' %}
+
+{% block teebb_page_content %}
+    <!-- Begin Page Content -->
+    <div class="container-fluid">
+        <!-- FULL WIDTH Content -->
+        <div class="full-width-wrapper">
+
+            <!-- 404 Error Text -->
+            <div class="text-center">
+                <div class="error mx-auto" data-text="{{ error_code }}">{{ error_code }}</div>
+                <p class="lead text-gray-800 mb-5">{{ error_message|trans({}, 'TeebbSBAdmin2Bundle') }}</p>
+                <p class="text-gray-500 mb-0">{{ error_message|trans({}, 'TeebbSBAdmin2Bundle') }}</p>
+                <a href="index.html">&larr; {{ 'Back to Dashboard'|trans({}, 'TeebbSBAdmin2Bundle') }}</a>
+            </div>
+
+        </div>
+
+    </div>
+    <!-- /.container-fluid -->
+{% endblock teebb_page_content %}

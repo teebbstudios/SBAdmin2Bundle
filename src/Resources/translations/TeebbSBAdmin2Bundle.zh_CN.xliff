@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" datatype="plaintext" original="">
+        <body>
+            <trans-unit id="TeebbSBAdmin2">
+                <source>TeebbSBAdmin2</source>
+                <target>TEEBB控制台</target>
+            </trans-unit>
+            <trans-unit id="noscript_warning">
+                <source>noscript_warning</source>
+                <target>你的浏览器并不支持Javascript，所以有些功能不能正常使用。</target>
+                </trans-unit>
+            <trans-unit id="Dashboard">
+                <source>Dashboard</source>
+                <target>控制台</target>
+            </trans-unit>
+            <trans-unit id="search_placeholder">
+                <source>search_placeholder</source>
+                <target>搜索内容...</target>
+            </trans-unit>
+
+            <trans-unit id="Back to Dashboard">
+                <source>Back to Dashboard</source>
+                <target>返回控制台首页</target>
+            </trans-unit>
+
+        </body>
+    </file>
+</xliff>

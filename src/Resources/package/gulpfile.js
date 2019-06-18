@@ -2,7 +2,6 @@
 
 // Load plugins
 const autoprefixer = require("gulp-autoprefixer");
-const browsersync = require("browser-sync").create();
 const cleanCSS = require("gulp-clean-css");
 const del = require("del");
 const gulp = require("gulp");
@@ -24,23 +23,6 @@ const banner = ['/*!\n',
     ' */\n',
     '\n'
 ].join('');
-
-// BrowserSync
-function browserSync(done) {
-    browsersync.init({
-        server: {
-            baseDir: "./"
-        },
-        port: 3000
-    });
-    done();
-}
-
-// BrowserSync reload
-function browserSyncReload(done) {
-    browsersync.reload();
-    done();
-}
 
 // Clean vendor
 function clean() {
@@ -152,7 +134,7 @@ function modules() {
 // CSS task
 function css() {
     return gulp
-        .src("./scss/**/*.scss")
+        .src("./public/bundles/teebbsbadmin2/scss/**/*.scss")
         .pipe(plumber())
         .pipe(sass({
             outputStyle: "expanded",
@@ -166,23 +148,23 @@ function css() {
         .pipe(header(banner, {
             pkg: pkg
         }))
-        .pipe(gulp.dest("./css"))
+        .pipe(gulp.dest("./public/bundles/teebbsbadmin2/css"))
         .pipe(rename({
             suffix: ".min"
         }))
         .pipe(cleanCSS())
-        .pipe(gulp.dest("./css"))
-        .pipe(browsersync.stream());
+        .pipe(gulp.dest("./public/bundles/teebbsbadmin2/css"));
+
 }
 
 // JS task
 function js() {
     return gulp
         .src([
-            './js/*.js',
-            './js/**/*.js',
-            '!./js/*.min.js',
-            '!./js/**/*.min.js',
+            './public/bundles/teebbsbadmin2/js/*.js',
+            './public/bundles/teebbsbadmin2/js/**/*.js',
+            '!./public/bundles/teebbsbadmin2/js/*.min.js',
+            '!./public/bundles/teebbsbadmin2/js/**/*.min.js',
         ])
         .pipe(uglify())
         .pipe(header(banner, {
@@ -191,21 +173,19 @@ function js() {
         .pipe(rename({
             suffix: '.min'
         }))
-        .pipe(gulp.dest('./js'))
-        .pipe(browsersync.stream());
+        .pipe(gulp.dest('./public/bundles/teebbsbadmin2/js'));
+
 }
 
 // Watch files
 function watchFiles() {
-    gulp.watch("./scss/**/*", css);
-    gulp.watch("./js/**/*", js);
-    gulp.watch("./**/*.html", browserSyncReload);
+    gulp.watch("./public/bundles/teebbsbadmin2/scss/**/*", css);
+    gulp.watch("./public/bundles/teebbsbadmin2/js/**/*", js);
 }
 
 // Define complex tasks
 const vendor = gulp.series(clean, modules);
 const build = gulp.series(vendor, gulp.parallel(css, js));
-const watch = gulp.series(build, gulp.parallel(watchFiles, browserSync));
 
 // Export tasks
 exports.css = css;
@@ -213,5 +193,4 @@ exports.js = js;
 exports.clean = clean;
 exports.vendor = vendor;
 exports.build = build;
-exports.watch = watch;
 exports.default = build;

@@ -1,9 +1,8 @@
 {
-    "title": "SB Admin 2",
+    "title": "SB Admin 2 Bundle",
     "name": "startbootstrap-sb-admin-2",
     "version": "4.0.4",
     "scripts": {
-        "start": "gulp watch",
         "postinstall": "npm install fabric@1.7.22 --no-optional"
     },
     "description": "An open source Bootstrap 4 admin theme.",
@@ -38,7 +37,6 @@
         "chart.js": "2.8.0",
         "datatables.net-bs4": "1.10.19",
         "dropzone": "^5.5.1",
-        "fabric": "^1.7.22",
         "file-saver": "^2.0.2",
         "jquery": "3.4.1",
         "jquery.easing": "^1.4.1",
@@ -54,7 +52,6 @@
         "video.js": "^7.5.4"
     },
     "devDependencies": {
-        "browser-sync": "2.26.5",
         "del": "4.1.1",
         "gulp": "4.0.2",
         "gulp-autoprefixer": "6.1.0",
