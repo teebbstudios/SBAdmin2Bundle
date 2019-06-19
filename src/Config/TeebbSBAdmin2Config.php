@@ -8,12 +8,12 @@ class TeebbSBAdmin2Config implements TeebbSBAdmin2ConfigInterface
     /**
      * @var string
      */
-    private $siteName;
+    private $logoText;
 
     /**
      * @var string
      */
-    private $siteLogo;
+    private $logoImage;
 
     /**
      * @var string
@@ -23,14 +23,24 @@ class TeebbSBAdmin2Config implements TeebbSBAdmin2ConfigInterface
     /**
      * @var array
      */
+    private $adminGroups;
+
+    /**
+     * @var array
+     */
+    private $adminServiceIds;
+
+    /**
+     * @var array
+     */
     private $options;
 
 
-    public function __construct($siteName, $siteLogo, $favicon, $options=[])
+    public function __construct($logoText, $logoImage, $favicon, $options=[])
     {
-        $this->siteName = $siteName;
+        $this->logoText = $logoText;
 
-        $this->siteLogo = $siteLogo;
+        $this->logoImage = $logoImage;
 
         $this->favicon = $favicon;
 
@@ -38,15 +48,22 @@ class TeebbSBAdmin2Config implements TeebbSBAdmin2ConfigInterface
     }
 
 
-    public function getSiteName(): string
+    /**
+     * @return string
+     */
+    public function getLogoText(): string
     {
-        return $this->siteName;
+        return $this->logoText;
     }
 
-    public function getSiteLogo(): string
+    /**
+     * @return string
+     */
+    public function getLogoImage(): string
     {
-        return $this->siteLogo;
+        return $this->logoImage;
     }
+
 
     public function getFavicon(): string
     {
@@ -60,5 +77,15 @@ class TeebbSBAdmin2Config implements TeebbSBAdmin2ConfigInterface
         }
 
         return $default;
+    }
+
+    public function getAdminGroups(): array
+    {
+        return $this->adminGroups;
+    }
+
+    public function setAdminGroups(array $adminGroups = [])
+    {
+        $this->adminGroups = $adminGroups;
     }
 }

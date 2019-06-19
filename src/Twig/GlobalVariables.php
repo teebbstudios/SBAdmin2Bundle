@@ -1,9 +1,6 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Teebb\SBAdmin2Bundle\Twig;
-
 
 use Teebb\SBAdmin2Bundle\Config\TeebbSBAdmin2ConfigInterface;
 

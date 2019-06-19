@@ -6,8 +6,8 @@
 >
     <services>
         <service id="sbadmin2.command.prepare" class="Teebb\SBAdmin2Bundle\Command\SBAdmin2PreparationCommand">
-            <argument type="service" id="service_container" />
-            <tag name="console.command" command="sbadmin2:preparation" />
+            <argument type="service" id="service_container"/>
+            <tag name="console.command" command="sbadmin2:preparation"/>
         </service>
     </services>
 </container>

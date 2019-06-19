@@ -1,3 +1,6 @@
+
+{% set _content = block('content') is defined ? block('content')|trim : null %}
+
 <!DOCTYPE html>
 <html lang="zh">
 
@@ -49,19 +52,19 @@
 
     <!-- Sidebar -->
     {% block teebb_left_side %}
-    <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+    <ul class="navbar-nav {{ teebb_sbadmin2.SBAdmin2Config.getOption('design').sidebar_bg_class }} sidebar sidebar-dark accordion" id="accordionSidebar">
 
         <!-- Sidebar - Brand -->
         {% block logo %}
         <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
             {% if 'single_image' == teebb_sbadmin2.SBAdmin2Config.getOption('logo_mode') or 'both' == teebb_sbadmin2.SBAdmin2Config.getOption('logo_mode') %}
                 <div class="sidebar-brand-icon{% if 'both' == teebb_sbadmin2.SBAdmin2Config.getOption('logo_mode') %} mr-2{% endif %}">
-                    <img src="{{ asset(teebb_sbadmin2.SBAdmin2Config.siteLogo) }}" alt="{{ teebb_sbadmin2.SBAdmin2Config.siteName }}">
+                    <img src="{{ asset(teebb_sbadmin2.SBAdmin2Config.logoImage) }}" alt="{{ teebb_sbadmin2.SBAdmin2Config.logoText|striptags }}">
                 </div>
             {% endif %}
             {% if 'single_text' == teebb_sbadmin2.SBAdmin2Config.getOption('logo_mode') or 'both' == teebb_sbadmin2.SBAdmin2Config.getOption('logo_mode') %}
                 <div class="sidebar-brand-text">
-                    {{ teebb_sbadmin2.SBAdmin2Config.siteName|raw }}
+                    {{ teebb_sbadmin2.SBAdmin2Config.logoText|raw }}
                 </div>
             {% endif %}
         </a>
@@ -323,6 +326,9 @@
                         {#{% include '@SonataCore/FlashMessage/render.html.twig' %}#}
                     {% endblock notice %}
 
+                    {% if _content is not empty %}
+                        {{ _content|raw }}
+                    {% endif %}
 
                 </div>
 

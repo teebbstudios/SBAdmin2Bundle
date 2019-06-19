@@ -22,8 +22,8 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->scalarNode('site_name')->defaultValue('TEEBB SBAdmin2')->cannotBeEmpty()->end()
-                ->scalarNode('site_logo')->defaultValue('bundles/teebbsbadmin2/img/logo.png')->cannotBeEmpty()->end()
+                ->scalarNode('logo_text')->defaultValue('TEEBB SBAdmin2')->cannotBeEmpty()->end()
+                ->scalarNode('logo_image')->defaultValue('bundles/teebbsbadmin2/img/logo.png')->cannotBeEmpty()->end()
                 ->scalarNode('favicon')->defaultValue('bundles/teebbsbadmin2/img/favicon.ico')->cannotBeEmpty()->end()
 
                 ->arrayNode("options")
@@ -154,6 +154,7 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+
                 ->arrayNode('assets')
                     ->addDefaultsIfNotSet()
                     ->children()
@@ -179,7 +180,6 @@ class Configuration implements ConfigurationInterface
                                 'bundles/teebbsbadmin2/vendor/bootstrap/js/bootstrap.bundle.min.js',
                                 'bundles/teebbsbadmin2/vendor/jquery-easing/jquery.easing.min.js',
 
-
                                 'bundles/teebbsbadmin2/js/sb-admin-2.min.js',
                             ])
                             ->prototype('scalar')->end()
@@ -195,14 +195,21 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
 
-                ->arrayNode("design")
+                ->arrayNode('templates')
                     ->addDefaultsIfNotSet()
                     ->children()
-                        ->enumNode('sidebar_background_class')
-                            ->values(['bg-gradient-primary', 'bg-gradient-secondary', 'bg-gradient-dark', 'bg-gradient-danger', 'bg-gradient-warning', 'bg-gradient-info',])
+                        ->scalarNode('layout')->defaultValue('@TeebbSBAdmin2/standard_layout.html.twig')->cannotBeEmpty()->end()
+                        ->scalarNode('dashboard')->defaultValue('@TeebbSBAdmin2/Core/dashboard.html.twig')->cannotBeEmpty()->end()
+                    ->end()
+                ->end()
+
+                ->arrayNode('design')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('sidebar_bg_class')->info('Left side background class.')
                             ->defaultValue('bg-gradient-primary')
-                            ->cannotBeEmpty()
                         ->end()
+
                     ->end()
                 ->end()
 

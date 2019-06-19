@@ -22,6 +22,8 @@ class TeebbSBAdmin2Extension extends Extension
         $resources = [
             'command',
             'core',
+            'twig',
+            'controller',
         ];
 
         foreach ($resources as $resource) {
@@ -33,12 +35,18 @@ class TeebbSBAdmin2Extension extends Extension
 
         $config['options']['javascripts'] = $this->buildJavascripts($config);
         $config['options']['stylesheets'] = $this->buildStylesheets($config);
+        $config['options']['design'] = $config['design'];
 
         $teebbSBAdmin2Config = $container->getDefinition('teebb.sbadmin2.config');
-        $teebbSBAdmin2Config->replaceArgument(0, $config['site_name']);
-        $teebbSBAdmin2Config->replaceArgument(1, $config['site_logo']);
+        $teebbSBAdmin2Config->replaceArgument(0, $config['logo_text']);
+        $teebbSBAdmin2Config->replaceArgument(1, $config['logo_image']);
         $teebbSBAdmin2Config->replaceArgument(2, $config['favicon']);
         $teebbSBAdmin2Config->replaceArgument(3, $config['options']);
+
+        $container->setParameter('teebb.sbadmin2.configuration.dashboard_groups', $config['dashboard']['groups']);
+        $container->setParameter('teebb.sbadmin2.configuration.dashboard_blocks', $config['dashboard']['blocks']);
+
+        $container->setParameter('teebb.sbadmin2.configuration.templates', $config['templates']);
 
 
     }

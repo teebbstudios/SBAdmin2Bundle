@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Teebb\SBAdmin2Bundle\DependencyInjection\CompilerPass;
+namespace Teebb\SBAdmin2Bundle\DependencyInjection\Compiler;
 
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;

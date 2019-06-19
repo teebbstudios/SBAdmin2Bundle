@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
         <service id="teebb.sbadmin2.config" class="Teebb\SBAdmin2Bundle\Config\TeebbSBAdmin2Config" public="true">
             <argument/>
@@ -11,6 +12,12 @@
         <!--twig global variables-->
         <service id="teebb.sbadmin2.twig.global" class="Teebb\SBAdmin2Bundle\Twig\GlobalVariables" public="true">
             <argument type="service" id="teebb.sbadmin2.config"/>
+        </service>
+
+        <!-- templating -->
+        <service id="teebb.sbadmin2.template_registry" class="Teebb\SBAdmin2Bundle\Templating\TemplateRegistry"
+                 public="true">
+            <argument>%teebb.sbadmin2.configuration.templates%</argument>
         </service>
 
     </services>
