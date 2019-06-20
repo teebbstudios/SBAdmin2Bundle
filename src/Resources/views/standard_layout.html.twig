@@ -1,6 +1,8 @@
 
 {% set _content = block('content') is defined ? block('content')|trim : null %}
-
+{% set _heading_label = block('heading_label') is defined ? block('heading_label')|trim : null %}
+{% set _heading_link = block('heading_link') is defined ? block('heading_link')|trim : null %}
+{{ dump(teebb_sbadmin2) }}
 <!DOCTYPE html>
 <html lang="zh">
 
@@ -16,7 +18,7 @@
     {% endblock %}
     <title>
         {% block teebb_head_title %}
-            {{ 'TeebbSBAdmin2'|trans({}, 'TeebbSBAdmin2Bundle') }}
+            {{ 'TeebbSBAdmin2'|trans({}, teebb_sbadmin2.transDomain) }}
 
 
         {% endblock %}
@@ -27,12 +29,12 @@
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
               rel="stylesheet">
 
-        {% for stylesheet in teebb_sbadmin2.SBAdmin2Config.getOption('stylesheets', []) %}
+        {% for stylesheet in teebb_sbadmin2.sbadmin2Config.getOption('stylesheets', []) %}
             <link rel="stylesheet" href="{{ asset(stylesheet) }}">
         {% endfor %}
     {% endblock %}
 
-    <link href="{{ asset( teebb_sbadmin2.SBAdmin2Config.favicon ) }}" rel="shortcut icon">
+    <link href="{{ asset( teebb_sbadmin2.sbadmin2Config.favicon ) }}" rel="shortcut icon">
 
 </head>
 
@@ -45,26 +47,26 @@
     {% block teebb_header_noscript_warning %}
         <noscript>
             <div class="noscript-warning fixed-top text-center bg-danger text-dark">
-                {{ 'noscript_warning'|trans({}, 'TeebbSBAdmin2Bundle') }}
+                {{ 'noscript_warning'|trans({}, teebb_sbadmin2.transDomain) }}
             </div>
         </noscript>
     {% endblock %}
 
     <!-- Sidebar -->
     {% block teebb_left_side %}
-    <ul class="navbar-nav {{ teebb_sbadmin2.SBAdmin2Config.getOption('design').sidebar_bg_class }} sidebar sidebar-dark accordion" id="accordionSidebar">
+    <ul class="navbar-nav {{ teebb_sbadmin2.sbadmin2Config.getOption('design').sidebar_bg_class }} sidebar sidebar-dark accordion" id="accordionSidebar">
 
         <!-- Sidebar - Brand -->
         {% block logo %}
-        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
-            {% if 'single_image' == teebb_sbadmin2.SBAdmin2Config.getOption('logo_mode') or 'both' == teebb_sbadmin2.SBAdmin2Config.getOption('logo_mode') %}
-                <div class="sidebar-brand-icon{% if 'both' == teebb_sbadmin2.SBAdmin2Config.getOption('logo_mode') %} mr-2{% endif %}">
-                    <img src="{{ asset(teebb_sbadmin2.SBAdmin2Config.logoImage) }}" alt="{{ teebb_sbadmin2.SBAdmin2Config.logoText|striptags }}">
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ path('teebb_sbadmin2_dashboard') }}">
+            {% if 'single_image' == teebb_sbadmin2.sbadmin2Config.getOption('logo_mode') or 'both' == teebb_sbadmin2.sbadmin2Config.getOption('logo_mode') %}
+                <div class="sidebar-brand-icon{% if 'both' == teebb_sbadmin2.sbadmin2Config.getOption('logo_mode') %} mr-2{% endif %}">
+                    <img src="{{ asset(teebb_sbadmin2.sbadmin2Config.logoImage) }}" alt="{{ teebb_sbadmin2.sbadmin2Config.logoText|striptags }}">
                 </div>
             {% endif %}
-            {% if 'single_text' == teebb_sbadmin2.SBAdmin2Config.getOption('logo_mode') or 'both' == teebb_sbadmin2.SBAdmin2Config.getOption('logo_mode') %}
+            {% if 'single_text' == teebb_sbadmin2.sbadmin2Config.getOption('logo_mode') or 'both' == teebb_sbadmin2.sbadmin2Config.getOption('logo_mode') %}
                 <div class="sidebar-brand-text">
-                    {{ teebb_sbadmin2.SBAdmin2Config.logoText|raw }}
+                    {{ teebb_sbadmin2.sbadmin2Config.logoText|raw }}
                 </div>
             {% endif %}
         </a>
@@ -74,9 +76,9 @@
 
         <!-- Nav Item - Dashboard -->
         <li class="nav-item active">
-            <a class="nav-link" href="index.html">
+            <a class="nav-link" href="{{ path('teebb_sbadmin2_dashboard') }}">
                 <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>{{ 'Dashboard'|trans({}, 'TeebbSBAdmin2Bundle') }}</span>
+                <span>{{ 'Dashboard'|trans({}, teebb_sbadmin2.transDomain) }}</span>
             </a>
         </li>
 
@@ -87,7 +89,7 @@
         {% endblock %}
 
         {% block side_bar_nav %}
-            {#{{ knp_menu_render('teebb_sbadmin2_sidebar', {template: get_global_template('knp_menu_template')}) }}#}
+            {#{{ knp_menu_render('teebb_sbadmin2_sidebar_menu') }}#}
         {% endblock side_bar_nav %}
 
         {% block side_bar_after_nav %}
@@ -164,11 +166,11 @@
 
                     <!-- Topbar Search -->
                     {% block teebb_topbar_search %}
-                        {% if teebb_sbadmin2.SBAdmin2Config.getOption('search') %}
+                        {% if teebb_sbadmin2.sbadmin2Config.getOption('search') %}
                         <li class="nav-item m-auto mx-1">
                             <form class="d-none d-lg-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                                 <div class="input-group">
-                                    <input type="text" class="form-control bg-light border-0 small" placeholder="{{ 'search_placeholder'|trans({}, 'TeebbSBAdmin2Bundle') }}"
+                                    <input type="text" class="form-control bg-light border-0 small" placeholder="{{ 'search_placeholder'|trans({}, teebb_sbadmin2.transDomain) }}"
                                            aria-label="Search" aria-describedby="basic-addon2">
                                     <div class="input-group-append">
                                         <button class="btn btn-primary" type="button">
@@ -191,7 +193,7 @@
                                 <form class="form-inline mr-auto w-100 navbar-search">
                                     <div class="input-group">
                                         <input type="text" class="form-control bg-light border-0 small"
-                                               placeholder="{{ 'search_placeholder'|trans({}, 'TeebbSBAdmin2Bundle') }}" aria-label="Search"
+                                               placeholder="{{ 'search_placeholder'|trans({}, teebb_sbadmin2.transDomain) }}" aria-label="Search"
                                                aria-describedby="basic-addon2">
                                         <div class="input-group-append">
                                             <button class="btn btn-primary" type="button">
@@ -207,7 +209,7 @@
 
                     <!-- Nav Item - Alerts -->
                     {% block teebb_topbar_alert %}
-                        {% if teebb_sbadmin2.SBAdmin2Config.getOption('alert') %}
+                        {% if teebb_sbadmin2.sbadmin2Config.getOption('alert') %}
                         <li class="nav-item dropdown no-arrow mx-1">
                             <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -239,7 +241,7 @@
 
                     <!-- Nav Item - Messages -->
                     {% block teebb_topbar_messages %}
-                        {% if teebb_sbadmin2.SBAdmin2Config.getOption('messages') %}
+                        {% if teebb_sbadmin2.sbadmin2Config.getOption('messages') %}
                         <li class="nav-item dropdown no-arrow mx-1">
                             <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button"
                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -314,9 +316,14 @@
                 {% block teebb_content_heading %}
                 <!-- Page Heading -->
                 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                    <h1 class="h3 mb-0 text-gray-800">控制台</h1>
-                    <a href="select-content-type.html" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-                                class="fas fa-plus-circle fa-sm text-white-50 pr-2"></i>添加内容</a>
+                    {% if _heading_label is not empty %}
+                    <h1 class="h3 mb-0 text-gray-800">
+                        {{ _heading_label|raw }}
+                    </h1>
+                    {% endif %}
+                    {% if _heading_link is not empty %}
+                        {{ _heading_link|raw }}
+                    {% endif %}
                 </div>
                 {% endblock teebb_content_heading%}
 
@@ -368,7 +375,7 @@
     {% endblock %}
 
     {% block teebb_javascripts %}
-        {% for javascript in teebb_sbadmin2.SBAdmin2Config.getOption('javascripts', []) %}
+        {% for javascript in teebb_sbadmin2.sbadmin2Config.getOption('javascripts', []) %}
         <script src="{{ asset(javascript) }}"></script>
         {% endfor %}
     {% endblock %}

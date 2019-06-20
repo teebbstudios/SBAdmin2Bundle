@@ -9,15 +9,34 @@ class GlobalVariables
     /**
      * @var TeebbSBAdmin2ConfigInterface
      */
-    private $SBAdmin2Config;
+    private $sbadmin2Config;
 
-    public function __construct(TeebbSBAdmin2ConfigInterface $SBAdmin2Config)
+    /**
+     * @var string
+     */
+    private $transDomain;
+
+    public function __construct(TeebbSBAdmin2ConfigInterface $sbadmin2Config)
     {
-        $this->SBAdmin2Config = $SBAdmin2Config;
+        $this->sbadmin2Config = $sbadmin2Config;
+        $this->transDomain = $sbadmin2Config->getOption('default_label_catalogue');
     }
 
-    public function getSBAdmin2Config()
+    /**
+     * @return TeebbSBAdmin2ConfigInterface
+     */
+    public function getSbadmin2Config(): TeebbSBAdmin2ConfigInterface
     {
-        return $this->SBAdmin2Config;
+        return $this->sbadmin2Config;
     }
+
+    /**
+     * @return string
+     */
+    public function getTransDomain(): string
+    {
+        return $this->transDomain;
+    }
+
+
 }

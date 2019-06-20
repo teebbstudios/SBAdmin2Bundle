@@ -1,5 +1,15 @@
 {% extends base_template %}
 
+{% block heading_label %}
+    {{ teebb_sbadmin2.sbadmin2Config.getOption('dashboard').label|trans({}, teebb_sbadmin2.transDomain) }}
+{% endblock %}
+
+{% block heading_link %}
+    {% set link_route = teebb_sbadmin2.sbadmin2Config.getOption('dashboard').link.link_route %}
+    {% set link_title = teebb_sbadmin2.sbadmin2Config.getOption('dashboard').link.link_title %}
+    {% include '@TeebbSBAdmin2/Button/_head_link.html.twig' with { _link_route : link_route, _link_title: link_title } %}
+{% endblock %}
+
 {% block content %}
 
     {% set has_top = false %}

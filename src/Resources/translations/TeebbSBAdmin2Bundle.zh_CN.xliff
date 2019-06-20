@@ -18,7 +18,6 @@
                 <source>search_placeholder</source>
                 <target>搜索内容...</target>
             </trans-unit>
-
             <trans-unit id="Back to Dashboard">
                 <source>Back to Dashboard</source>
                 <target>返回控制台首页</target>

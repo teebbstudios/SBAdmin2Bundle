@@ -36,6 +36,7 @@ class TeebbSBAdmin2Extension extends Extension
         $config['options']['javascripts'] = $this->buildJavascripts($config);
         $config['options']['stylesheets'] = $this->buildStylesheets($config);
         $config['options']['design'] = $config['design'];
+        $config['options']['dashboard'] = $config['dashboard']['heading'];
 
         $teebbSBAdmin2Config = $container->getDefinition('teebb.sbadmin2.config');
         $teebbSBAdmin2Config->replaceArgument(0, $config['logo_text']);
