@@ -33,6 +33,7 @@ class Configuration implements ConfigurationInterface
         $this->addAssetsSection($rootNode);
         $this->addTemplatesSection($rootNode);
         $this->addDashboardSection($rootNode);
+        $this->addAdminsSection($rootNode);
 
         return $treeBuilder;
     }
@@ -153,8 +154,9 @@ class Configuration implements ConfigurationInterface
                                 ->scalarNode('label')->defaultValue("Dashboard")->cannotBeEmpty()->end()
                                 ->arrayNode('link')
                                     ->children()
-                                        ->scalarNode('link_route')->defaultValue('')->end()
-                                        ->scalarNode('link_title')->defaultValue('')->end()
+                                        ->scalarNode('link_route')->end()
+                                        ->scalarNode('link_title')->end()
+                                        ->scalarNode('link_icon')->defaultValue('fa-plus-circle')->end()
                                     ->end()
                                 ->end()
                             ->end()
@@ -184,6 +186,7 @@ class Configuration implements ConfigurationInterface
                                     ->scalarNode('label')->end()
                                     ->scalarNode('label_catalogue')->end()
                                     ->scalarNode('icon')->defaultValue('<i class="fas fa-folder"></i>')->end()
+                                    ->integerNode('priority')->defaultValue(0)->end()
                                     ->scalarNode('provider')->end()
                                     ->arrayNode('items')
                                         ->beforeNormalization()
@@ -268,7 +271,78 @@ class Configuration implements ConfigurationInterface
         ;
     }
 
-    private function addEntitiesSection(ArrayNodeDefinition $rootNode){
+    private function addAdminsSection(ArrayNodeDefinition $rootNode){
+        $rootNode
+            ->children()
+                ->arrayNode("admins")->info('Admins config.')
+                ->useAttributeAsKey('service_id')
+                    ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('entity')->cannotBeEmpty()->end()
+                            ->scalarNode('controller')->end()
+                            ->scalarNode('parent')->end()
+                            ->scalarNode('group')->defaultValue('default')->end()
+                            ->scalarNode('label')->end()
+                            ->scalarNode('icon')->defaultValue('<i class="fas fa-folder"></i>')->end()
+                            ->integerNode('priority')->defaultValue(0)->end()
+                            ->scalarNode('label_catalogue')->end()
+                            ->scalarNode('title')->info('Content heading title and title syntax value. Default will auto generate.')->end()
+                            ->arrayNode('head_link')
+                                ->children()
+                                    ->scalarNode('link_route')->end()
+                                    ->scalarNode('link_title')->end()
+                                    ->scalarNode('link_icon')->defaultValue('fa-plus-circle')->end()
+                                ->end()
+                            ->end()
+                            ->arrayNode('list')->info('Entity list config.')
+                                ->children()
 
+                                    ->arrayNode('fields')->info('Config the entity field to show in the list.')
+                                        ->arrayPrototype()
+                                            ->children()
+                                                ->scalarNode('property')->end()
+                                                ->scalarNode('label')->end()
+                                                ->scalarNode('class')->info('This cloumn css class.')->end()
+                                            ->end()
+                                        ->end()
+                                    ->end()
+
+                                    ->arrayNode('actions')->info('List item action.')
+                                        ->arrayPrototype()
+                                            ->children()
+                                                ->scalarNode('name')->end()
+                                                ->scalarNode('label')->end()
+                                                ->scalarNode('icon')->end()
+                                                ->scalarNode('class')->end()
+                                                ->enumNode('type')->defaultValue('item')->values(['item','group'])->end()
+                                            ->end()
+                                        ->end()
+                                    ->end()
+
+                                    ->arrayNode('filters')->info('Filter the list item.')
+                                        ->arrayPrototype()
+                                            ->children()
+                                                ->scalarNode('name')->info('The property')->end()
+                                                ->scalarNode('type')->info('The property form field type.Default guess field type.')->end()
+                                            ->end()
+                                        ->end()
+                                    ->end()
+
+                                    ->arrayNode('batch_actions')->info('batch option for the list items.')
+                                        ->arrayPrototype()
+                                            ->children()
+                                                ->scalarNode('action')->info('The batch option name.')->end()
+                                                ->scalarNode('option_name')->info('The option syntax name.')->end()
+                                                ->scalarNode('option_label')->info('The option syntax value.')->end()
+                                            ->end()
+                                        ->end()
+                                    ->end()
+
+                                ->end()
+                            ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
     }
 }

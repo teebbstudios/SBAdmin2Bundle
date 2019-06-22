@@ -5,9 +5,11 @@
 {% endblock %}
 
 {% block heading_link %}
-    {% set link_route = teebb_sbadmin2.sbadmin2Config.getOption('dashboard').link.link_route %}
-    {% set link_title = teebb_sbadmin2.sbadmin2Config.getOption('dashboard').link.link_title %}
-    {% include '@TeebbSBAdmin2/Button/_head_link.html.twig' with { _link_route : link_route, _link_title: link_title } %}
+    {% set link_object = teebb_sbadmin2.sbadmin2Config.getOption('dashboard').link %}
+    {% set link_route = link_object.link_route %}
+    {% set link_title = link_object.link_title %}
+    {% set link_icon = link_object.link_icon %}
+    {% include '@TeebbSBAdmin2/Button/_head_link.html.twig' with { _link_route : link_route, _link_title: link_title, _link_icon: link_icon } %}
 {% endblock %}
 
 {% block content %}

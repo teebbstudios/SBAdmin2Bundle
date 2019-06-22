@@ -7,6 +7,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Teebb\SBAdmin2Bundle\Admin\AdminInterface;
 
 class TeebbSBAdmin2Extension extends Extension
 {
@@ -32,7 +33,7 @@ class TeebbSBAdmin2Extension extends Extension
 
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
-
+//dd($config);
         $config['options']['javascripts'] = $this->buildJavascripts($config);
         $config['options']['stylesheets'] = $this->buildStylesheets($config);
         $config['options']['design'] = $config['design'];
@@ -49,6 +50,8 @@ class TeebbSBAdmin2Extension extends Extension
 
         $container->setParameter('teebb.sbadmin2.configuration.templates', $config['templates']);
 
+        //Add the tags name "teebb.sbadmin2" for all the admin service implements the AdminInterface.
+        $container->registerForAutoconfiguration(AdminInterface::class)->addTag('teebb.sbadmin2');
 
     }
 
