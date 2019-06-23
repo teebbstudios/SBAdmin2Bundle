@@ -24,6 +24,7 @@ class TeebbSBAdmin2Extension extends Extension
             'command',
             'core',
             'twig',
+            'menu',
             'controller',
         ];
 
@@ -33,7 +34,7 @@ class TeebbSBAdmin2Extension extends Extension
 
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
-//dd($config);
+
         $config['options']['javascripts'] = $this->buildJavascripts($config);
         $config['options']['stylesheets'] = $this->buildStylesheets($config);
         $config['options']['design'] = $config['design'];
@@ -45,13 +46,16 @@ class TeebbSBAdmin2Extension extends Extension
         $teebbSBAdmin2Config->replaceArgument(2, $config['favicon']);
         $teebbSBAdmin2Config->replaceArgument(3, $config['options']);
 
+        $container->setParameter('teebb.sbadmin2.configuration.default_label_catalogue', $config['options']['default_label_catalogue']);
+        $container->setParameter('teebb.sbadmin2.configuration.default_icon', $config['options']['default_icon']);
+
         $container->setParameter('teebb.sbadmin2.configuration.dashboard_groups', $config['dashboard']['groups']);
         $container->setParameter('teebb.sbadmin2.configuration.dashboard_blocks', $config['dashboard']['blocks']);
 
         $container->setParameter('teebb.sbadmin2.configuration.templates', $config['templates']);
 
-        //Add the tags name "teebb.sbadmin2" for all the admin service implements the AdminInterface.
-        $container->registerForAutoconfiguration(AdminInterface::class)->addTag('teebb.sbadmin2');
+        $container->setParameter('teebb.sbadmin2.configuration.admins', $config['admins']);
+
 
     }
 

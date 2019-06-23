@@ -5,7 +5,6 @@ namespace Teebb\SBAdmin2Bundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Teebb\SBAdmin2Bundle\Config\TeebbSBAdmin2ConfigInterface;
 use Teebb\SBAdmin2Bundle\Templating\TemplateRegistryInterface;
 

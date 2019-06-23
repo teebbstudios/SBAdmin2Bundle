@@ -2,7 +2,7 @@
 {% set _content = block('content') is defined ? block('content')|trim : null %}
 {% set _heading_label = block('heading_label') is defined ? block('heading_label')|trim : null %}
 {% set _heading_link = block('heading_link') is defined ? block('heading_link')|trim : null %}
-{{ dump(teebb_sbadmin2) }}
+{{ knp_menu_render('teebb_sbadmin2_sidebar') }}
 <!DOCTYPE html>
 <html lang="zh">
 
@@ -89,7 +89,7 @@
         {% endblock %}
 
         {% block side_bar_nav %}
-            {#{{ knp_menu_render('teebb_sbadmin2_sidebar_menu') }}#}
+
         {% endblock side_bar_nav %}
 
         {% block side_bar_after_nav %}

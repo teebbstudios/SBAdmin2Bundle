@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="teebb.sbadmin2.menu_builder" class="Teebb\SBAdmin2Bundle\Menu\MenuBuilder" public="true">
+            <argument type="service" id="teebb.sbadmin2.config"/>
+            <argument type="service" id="knp_menu.factory"/>
+            <argument type="service" id="knp_menu.menu_provider"/>
+            <argument type="service" id="event_dispatcher"/>
+        </service>
+        <service id="teebb.sbadmin2.sidebar_menu" class="Knp\Menu\MenuItem" public="true">
+            <factory service="teebb.sbadmin2.menu_builder" method="createSidebarMenu"/>
+            <tag name="knp_menu.menu" alias="teebb_sbadmin2_sidebar"/>
+        </service>
+
+    </services>
+</container>

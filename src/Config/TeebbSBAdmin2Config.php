@@ -33,6 +33,11 @@ class TeebbSBAdmin2Config implements TeebbSBAdmin2ConfigInterface
     /**
      * @var array
      */
+    private $entityClasses;
+
+    /**
+     * @var array
+     */
     private $options;
 
 
@@ -88,4 +93,37 @@ class TeebbSBAdmin2Config implements TeebbSBAdmin2ConfigInterface
     {
         $this->adminGroups = $adminGroups;
     }
+
+    /**
+     * @return array
+     */
+    public function getAdminServiceIds(): array
+    {
+        return $this->adminServiceIds;
+    }
+
+    /**
+     * @param array $adminServiceIds
+     */
+    public function setAdminServiceIds(array $adminServiceIds): void
+    {
+        $this->adminServiceIds = $adminServiceIds;
+    }
+
+    /**
+     * @return array
+     */
+    public function getEntityClasses(): array
+    {
+        return $this->entityClasses;
+    }
+
+    /**
+     * @param array $entityClasses
+     */
+    public function setEntityClasses(array $entityClasses): void
+    {
+        $this->entityClasses = $entityClasses;
+    }
+
 }
