@@ -69,7 +69,7 @@ class AdminServicesCompilePass implements CompilerPassInterface
         $groups = array_merge_recursive($dashboardGroupsSettings, $configAdminGroups);
 
         $elementSort = function (&$element) {
-            usort(
+            uasort(
                 $element,
                 function ($a, $b) {
 
@@ -93,5 +93,9 @@ class AdminServicesCompilePass implements CompilerPassInterface
         $sbadmin2ConfigDefinition->addMethodCall('setAdminGroups', [$groups]);
         $sbadmin2ConfigDefinition->addMethodCall('setAdminServiceIds', [$adminServiceIds]);
         $sbadmin2ConfigDefinition->addMethodCall('setEntityClasses', [$entityClasses]);
+
+        $templates = $container->getParameter('teebb.sbadmin2.configuration.templates');
+        $sbadmin2ConfigDefinition->addMethodCall('setTemplates', [$templates]);
+
     }
 }

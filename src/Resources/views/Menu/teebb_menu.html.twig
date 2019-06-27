@@ -1,0 +1,73 @@
+{% extends 'knp_menu.html.twig' %}
+
+{% block list %}
+
+    {% for group in item.getExtra('group') %}
+        <div class="sidebar-heading">
+            {{ group|trans({}, item.getExtra('translation_domain','messages')) }}
+        </div>
+
+        {% if item.hasChildren and options.depth is not same as(0) and item.displayChildren %}
+            {% with {'group':group} %}
+                {{ block('children') }}
+            {% endwith %}
+        {% endif %}
+
+        <hr class="sidebar-divider">
+    {% endfor %}
+
+{% endblock %}
+
+{% block children %}
+    {# save current variables #}
+    {% set currentOptions = options %}
+    {% set currentItem = item %}
+    {# update the depth for children #}
+    {% if options.depth is not none %}
+        {% set options = options|merge({'depth': currentOptions.depth - 1}) %}
+    {% endif %}
+    {# update the matchingDepth for children #}
+    {% if options.matchingDepth is not none and options.matchingDepth > 0 %}
+        {% set options = options|merge({'matchingDepth': currentOptions.matchingDepth - 1}) %}
+    {% endif %}
+    {% for item in currentItem.children %}
+        {% with {'group':group} %}
+            {{ block('item') }}
+        {% endwith %}
+    {% endfor %}
+    {# restore current variables #}
+    {% set item = currentItem %}
+    {% set options = currentOptions %}
+{% endblock %}
+
+{% block item %}
+    {% if item.extra('group') == group %}
+        {% set trans_domain = item.extra('translation_domain', 'messages') %}
+        {% if item.hasChildren %}
+            <!-- Nav Item -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#{{ item.name }}"
+                   aria-expanded="true" aria-controls="{{ item.name }}">
+                    <i class="fas fa-fw {{ item.extra('icon') }}"></i>
+                    <span>{{ item.name|trans({}, trans_domain) }}</span>
+                </a>
+                <div id="{{ item.name }}" class="collapse" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">{{ (item.name ~ 'head:')|trans({}, trans_domain) }}</h6>
+                        {% for children in item.children %}
+                            <a class="collapse-item" href="{{ children.uri }}">{{ children.name|trans({}, children.extra('translation_domain', 'messages')) }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </li>
+        {% else %}
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#">
+                    <i class="fas fa-fw {{ item.extra('icon') }}"></i>
+                    <span>{{ item.name|trans({}, trans_domain) }}</span>
+                </a>
+            </li>
+        {% endif %}
+    {% endif %}
+
+{% endblock %}

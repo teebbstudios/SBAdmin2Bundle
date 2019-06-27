@@ -61,6 +61,7 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('layout')->defaultValue('@TeebbSBAdmin2/standard_layout.html.twig')->cannotBeEmpty()->end()
                         ->scalarNode('dashboard')->defaultValue('@TeebbSBAdmin2/Core/dashboard.html.twig')->cannotBeEmpty()->end()
+                        ->scalarNode('knp_sidebar_menu')->defaultValue('@TeebbSBAdmin2/Menu/teebb_menu.html.twig')->cannotBeEmpty()->end()
                     ->end()
                 ->end()
             ->end()
@@ -202,7 +203,7 @@ class Configuration implements ConfigurationInterface
                                                             $items[$key]['route_params'] = [];
                                                         }
 
-                                                        $items[$key]['admin'] = '';
+//                                                        $items[$key]['admin'] = null;
                                                     } else {
                                                         $items[$key] = [
                                                             'admin' => $item,

@@ -40,6 +40,11 @@ class TeebbSBAdmin2Config implements TeebbSBAdmin2ConfigInterface
      */
     private $options;
 
+    /**
+     * @var array
+     */
+    private $templates=[];
+
 
     public function __construct($logoText, $logoImage, $favicon, $options=[])
     {
@@ -125,5 +130,19 @@ class TeebbSBAdmin2Config implements TeebbSBAdmin2ConfigInterface
     {
         $this->entityClasses = $entityClasses;
     }
+
+    /**
+     * @param array $templates
+     */
+    public function setTemplates(array $templates): void
+    {
+        $this->templates = $templates;
+    }
+
+    public function getTemplate(string $templateName): string
+    {
+       return $this->templates[$templateName];
+    }
+
 
 }

@@ -18,4 +18,10 @@ interface TeebbSBAdmin2ConfigInterface
 
     public function getOption(string $optionName);
 
+    /**
+     * @param string $templateName
+     * @return string
+     */
+    public function getTemplate(string $templateName): string;
+
 }
