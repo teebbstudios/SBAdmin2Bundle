@@ -41,10 +41,10 @@ class TeebbSBAdmin2Extension extends Extension
         $config['options']['dashboard'] = $config['dashboard']['heading'];
 
         $teebbSBAdmin2Config = $container->getDefinition('teebb.sbadmin2.config');
-        $teebbSBAdmin2Config->replaceArgument(0, $config['logo_text']);
-        $teebbSBAdmin2Config->replaceArgument(1, $config['logo_image']);
-        $teebbSBAdmin2Config->replaceArgument(2, $config['favicon']);
-        $teebbSBAdmin2Config->replaceArgument(3, $config['options']);
+        $teebbSBAdmin2Config->replaceArgument(1, $config['logo_text']);
+        $teebbSBAdmin2Config->replaceArgument(2, $config['logo_image']);
+        $teebbSBAdmin2Config->replaceArgument(3, $config['favicon']);
+        $teebbSBAdmin2Config->replaceArgument(4, $config['options']);
 
         $container->setParameter('teebb.sbadmin2.configuration.default_label_catalogue', $config['options']['default_label_catalogue']);
         $container->setParameter('teebb.sbadmin2.configuration.default_icon', $config['options']['default_icon']);

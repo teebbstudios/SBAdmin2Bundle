@@ -19,6 +19,7 @@
 {% endblock %}
 
 {% block children %}
+
     {# save current variables #}
     {% set currentOptions = options %}
     {% set currentItem = item %}
@@ -31,9 +32,22 @@
         {% set options = options|merge({'matchingDepth': currentOptions.matchingDepth - 1}) %}
     {% endif %}
     {% for item in currentItem.children %}
-        {% with {'group':group} %}
-            {{ block('item') }}
-        {% endwith %}
+
+        {% if item.displayed %}
+            {#- check role of the group #}
+            {% set display = (item.extra('roles') is empty ) %}
+
+            {% for role in item.extra('roles') if not display %}
+                {% set display = is_granted(role) %}
+            {% endfor %}
+        {% endif %}
+
+        {% if display %}
+            {% with {'group':group} %}
+                {{ block('item') }}
+            {% endwith %}
+        {% endif %}
+
     {% endfor %}
     {# restore current variables #}
     {% set item = currentItem %}
@@ -41,6 +55,7 @@
 {% endblock %}
 
 {% block item %}
+
     {% if item.extra('group') == group %}
         {% set trans_domain = item.extra('translation_domain', 'messages') %}
         {% if item.hasChildren %}

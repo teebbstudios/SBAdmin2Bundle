@@ -203,7 +203,7 @@ class Configuration implements ConfigurationInterface
                                                             $items[$key]['route_params'] = [];
                                                         }
 
-//                                                        $items[$key]['admin'] = null;
+                                                        $items[$key]['admin'] = null;
                                                     } else {
                                                         $items[$key] = [
                                                             'admin' => $item,
@@ -283,10 +283,14 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('controller')->end()
                             ->scalarNode('group')->defaultValue('default')->end()
                             ->scalarNode('label')->cannotBeEmpty()->end()
+                            ->booleanNode('hide_sidebar')->info('Whether to display in the sidebar menu.')->defaultFalse()->end()
                             ->scalarNode('icon')->defaultValue('fa-folder')->end()
                             ->integerNode('priority')->defaultValue(0)->end()
+                            ->arrayNode('roles')
+                                    ->prototype('scalar')->defaultValue([])->end()
+                            ->end()
 
-                            ->scalarNode('parent')->cannotBeEmpty()->info('The admin parent admin for general route.')->end()
+                            ->scalarNode('children')->cannotBeEmpty()->info('The admin children admin for general route.')->end()
                             ->scalarNode('map_property')->cannotBeEmpty()->end()
 
                             ->scalarNode('label_catalogue')->info('Current admin translation domain catelogue.')->end()

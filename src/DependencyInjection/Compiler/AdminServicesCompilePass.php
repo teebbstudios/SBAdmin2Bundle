@@ -34,9 +34,13 @@ class AdminServicesCompilePass implements CompilerPassInterface
             ];
 
             $definition->setArguments($arguments);
+            $definition->setPublic(true);
 
-            if (array_key_exists('parent', $adminConfig) && array_key_exists('map_property', $adminConfig)) {
-                $definition->addMethodCall('addChild', [new Reference($adminConfig['parent']), $adminConfig['map_property']]);
+            $definition->addMethodCall('setLabel', [$adminConfig['label']]);
+
+
+            if (array_key_exists('children', $adminConfig) && array_key_exists('map_property', $adminConfig)) {
+                $definition->addMethodCall('addChild', [new Reference($adminConfig['children']), $adminConfig['map_property']]);
             }
 
             $labelCatalogue = $adminConfig['label_catalogue'] ??
@@ -47,21 +51,23 @@ class AdminServicesCompilePass implements CompilerPassInterface
 
 
             if (!isset($configAdminGroups[$adminConfig['group']][$adminConfig['label']])) {
-                $configAdminGroups[$adminConfig['group']][$adminConfig['label']] = [
-                    'label' => $adminConfig['label'],
-                    'label_catalogue' => $labelCatalogue,
-                    'icon' => $groupIcon,
-                    'roles' => [],
-                    'priority' => $adminConfig['priority'],
-                ];
+                if (!$adminConfig['hide_sidebar']){
+                    $configAdminGroups[$adminConfig['group']][$adminConfig['label']] = [
+                        'label' => $adminConfig['label'],
+                        'label_catalogue' => $labelCatalogue,
+                        'icon' => $groupIcon,
+                        'roles' => $adminConfig['roles'] ?? [],
+                        'priority' => $adminConfig['priority'],
+                    ];
 
-                $configAdminGroups[$adminConfig['group']][$adminConfig['label']]['items'][] = [
-                    'admin' => $adminServiceId,
-                    'label' => $adminConfig['label'] ?? '',
-                    'route' => '',
-                    'route_params' => [],
-                    'route_absolute' => false,
-                ];
+                    $configAdminGroups[$adminConfig['group']][$adminConfig['label']]['items'][] = [
+                        'admin' => $adminServiceId,
+                        'label' => $adminConfig['label'] ?? '',
+                        'route' => '',
+                        'route_params' => [],
+                        'route_absolute' => false,
+                    ];
+                }
             }
 
         }
@@ -87,10 +93,9 @@ class AdminServicesCompilePass implements CompilerPassInterface
 
         array_walk($groups, $elementSort);
 
-
         $sbadmin2ConfigDefinition = $container->getDefinition('teebb.sbadmin2.config');
 
-        $sbadmin2ConfigDefinition->addMethodCall('setAdminGroups', [$groups]);
+        $sbadmin2ConfigDefinition->addMethodCall('setMenuGroups', [$groups]);
         $sbadmin2ConfigDefinition->addMethodCall('setAdminServiceIds', [$adminServiceIds]);
         $sbadmin2ConfigDefinition->addMethodCall('setEntityClasses', [$entityClasses]);
 

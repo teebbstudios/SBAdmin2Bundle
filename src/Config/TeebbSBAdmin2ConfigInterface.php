@@ -12,9 +12,9 @@ interface TeebbSBAdmin2ConfigInterface
 
     public function getFavicon(): string;
 
-    public function setAdminGroups();
+    public function setMenuGroups();
 
-    public function getAdminGroups(): array;
+    public function getMenuGroups(): array;
 
     public function getOption(string $optionName);
 
@@ -24,4 +24,5 @@ interface TeebbSBAdmin2ConfigInterface
      */
     public function getTemplate(string $templateName): string;
 
+    public function getInstance(string $adminServiceId);
 }

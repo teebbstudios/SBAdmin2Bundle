@@ -3,6 +3,9 @@
 namespace Teebb\SBAdmin2Bundle\Config;
 
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Teebb\SBAdmin2Bundle\Admin\AdminInterface;
+
 class TeebbSBAdmin2Config implements TeebbSBAdmin2ConfigInterface
 {
     /**
@@ -16,6 +19,11 @@ class TeebbSBAdmin2Config implements TeebbSBAdmin2ConfigInterface
     private $logoImage;
 
     /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
+    /**
      * @var string
      */
     private $favicon;
@@ -23,7 +31,7 @@ class TeebbSBAdmin2Config implements TeebbSBAdmin2ConfigInterface
     /**
      * @var array
      */
-    private $adminGroups;
+    private $menuGroups;
 
     /**
      * @var array
@@ -46,8 +54,10 @@ class TeebbSBAdmin2Config implements TeebbSBAdmin2ConfigInterface
     private $templates=[];
 
 
-    public function __construct($logoText, $logoImage, $favicon, $options=[])
+    public function __construct(ContainerInterface $container, $logoText, $logoImage, $favicon, $options=[])
     {
+        $this->container = $container;
+
         $this->logoText = $logoText;
 
         $this->logoImage = $logoImage;
@@ -89,14 +99,14 @@ class TeebbSBAdmin2Config implements TeebbSBAdmin2ConfigInterface
         return $default;
     }
 
-    public function getAdminGroups(): array
+    public function getMenuGroups(): array
     {
-        return $this->adminGroups;
+        return $this->menuGroups;
     }
 
-    public function setAdminGroups(array $adminGroups = [])
+    public function setMenuGroups(array $menuGroups = [])
     {
-        $this->adminGroups = $adminGroups;
+        $this->menuGroups = $menuGroups;
     }
 
     /**
@@ -144,5 +154,43 @@ class TeebbSBAdmin2Config implements TeebbSBAdmin2ConfigInterface
        return $this->templates[$templateName];
     }
 
+    public function getInstance(string $adminServiceId)
+    {
+        if (!\in_array($adminServiceId, $this->adminServiceIds, true)) {
+            $msg = sprintf('Admin service "%s" not found in admin pool.', $adminServiceId);
+            $shortest = -1;
+            $closest = null;
+            $alternatives = [];
+            foreach ($this->adminServiceIds as $adminServiceId) {
+                $lev = levenshtein($adminServiceId, $adminServiceId);
+                if ($lev <= $shortest || $shortest < 0) {
+                    $closest = $adminServiceId;
+                    $shortest = $lev;
+                }
+                if ($lev <= \strlen($adminServiceId) / 3 || false !== strpos($adminServiceId, $adminServiceId)) {
+                    $alternatives[$adminServiceId] = $lev;
+                }
+            }
+            if (null !== $closest) {
+                asort($alternatives);
+                unset($alternatives[$closest]);
+                $msg = sprintf(
+                    'Admin service "%s" not found. Did you mean "%s" or one of those: [%s]?',
+                    $adminServiceId,
+                    $closest,
+                    implode(', ', array_keys($alternatives))
+                );
+            }
+            throw new \InvalidArgumentException($msg);
+        }
+
+        $admin = $this->container->get($adminServiceId);
+
+        if (!$admin instanceof AdminInterface) {
+            throw new \InvalidArgumentException(sprintf('Found service "%s" is not a valid admin service', $adminServiceId));
+        }
+
+        return $admin;
+    }
 
 }
