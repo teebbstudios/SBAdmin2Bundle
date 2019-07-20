@@ -25,6 +25,21 @@ class AdminTest extends KernelTestCase
         $categoryAdmin = self::$container->get('App\Admin\CategoryAdmin');
 
         $this->assertTrue($categoryAdmin->hasChild('App\Admin\ArticleAdmin'));
+
+        $this->assertSame(null, $categoryAdmin->getParent());
+
+        $this->assertSame('Category', $articleAdmin->getParent()->getLabel());
+
     }
 
+    public function testAdminRoutes()
+    {
+        $articleAdmin = self::$container->get('App\Admin\ArticleAdmin');
+
+
+        $routes = $articleAdmin->getRoutes()->getElements();
+
+        var_dump($routes);
+
+    }
 }

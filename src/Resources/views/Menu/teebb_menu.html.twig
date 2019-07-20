@@ -55,13 +55,12 @@
 {% endblock %}
 
 {% block item %}
-
     {% if item.extra('group') == group %}
         {% set trans_domain = item.extra('translation_domain', 'messages') %}
         {% if item.hasChildren %}
             <!-- Nav Item -->
             <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#{{ item.name }}"
+                <a class="nav-link collapsed" href="{{ item.uri }}" data-toggle="collapse" data-target="#{{ item.name }}"
                    aria-expanded="true" aria-controls="{{ item.name }}">
                     <i class="fas fa-fw {{ item.extra('icon') }}"></i>
                     <span>{{ item.name|trans({}, trans_domain) }}</span>
@@ -77,7 +76,7 @@
             </li>
         {% else %}
             <li class="nav-item">
-                <a class="nav-link collapsed" href="#">
+                <a class="nav-link collapsed" href="{{ item.uri }}">
                     <i class="fas fa-fw {{ item.extra('icon') }}"></i>
                     <span>{{ item.name|trans({}, trans_domain) }}</span>
                 </a>

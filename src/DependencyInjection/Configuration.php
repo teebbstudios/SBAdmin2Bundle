@@ -293,7 +293,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('children')->cannotBeEmpty()->info('The admin children admin for general route.')->end()
                             ->scalarNode('map_property')->cannotBeEmpty()->end()
 
-                            ->scalarNode('label_catalogue')->info('Current admin translation domain catelogue.')->end()
+                            ->scalarNode('label_catalogue')->defaultValue("TeebbSBAdmin2Bundle")->info('Current admin translation domain catelogue.')->end()
                             ->scalarNode('title')->info('Content heading title and title syntax value. Default will auto generate.')->end()
                             ->arrayNode('head_link')
                                 ->children()

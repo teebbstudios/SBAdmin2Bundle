@@ -30,17 +30,26 @@ class AdminServicesCompilePass implements CompilerPassInterface
             $arguments = [
                 0 => $adminServiceId,
                 1 => $adminConfig['entity'],
-                2 => $adminConfig['controller'] ?? CRUDController::class,
+                2 => $adminConfig['controller'] ?? CRUDController::class
             ];
 
             $definition->setArguments($arguments);
             $definition->setPublic(true);
 
             $definition->addMethodCall('setLabel', [$adminConfig['label']]);
+            $definition->addMethodCall('setTranslationDomain', [$adminConfig['label_catalogue']]);
 
+            //Set routeBuilder
+            $definition->addMethodCall('setRouteBuilder', [new Reference('teebb_sbadmin2.route.path_info_builder')]);
+            //Set UrlGenerator
+            $definition->addMethodCall('setRouteGenerator', [new Reference('teebb_sbadmin2.route.default_route_generator')]);
 
+            //If children Admin exits, add children Admin and set parent Admin.
             if (array_key_exists('children', $adminConfig) && array_key_exists('map_property', $adminConfig)) {
                 $definition->addMethodCall('addChild', [new Reference($adminConfig['children']), $adminConfig['map_property']]);
+
+                $childrenDefinition = $container->getDefinition($adminConfig['children']);
+                $childrenDefinition->addMethodCall('setParent', [new Reference($adminServiceId)]);
             }
 
             $labelCatalogue = $adminConfig['label_catalogue'] ??
@@ -98,6 +107,10 @@ class AdminServicesCompilePass implements CompilerPassInterface
         $sbadmin2ConfigDefinition->addMethodCall('setMenuGroups', [$groups]);
         $sbadmin2ConfigDefinition->addMethodCall('setAdminServiceIds', [$adminServiceIds]);
         $sbadmin2ConfigDefinition->addMethodCall('setEntityClasses', [$entityClasses]);
+
+        //Set route loader the second argument;
+        $adminRouteLoaderDefinition = $container->getDefinition('teebb.sbadmin2.route.admin_route_loader');
+        $adminRouteLoaderDefinition->setArgument(1, $adminServiceIds);
 
         $templates = $container->getParameter('teebb.sbadmin2.configuration.templates');
         $sbadmin2ConfigDefinition->addMethodCall('setTemplates', [$templates]);

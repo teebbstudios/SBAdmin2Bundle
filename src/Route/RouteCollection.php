@@ -93,11 +93,11 @@ class RouteCollection
             $defaults['_controller'] = $this->baseControllerName.$actionJoiner.$this->actionify($code);
         }
 
-        if (!isset($defaults['_sonata_admin'])) {
-            $defaults['_sonata_admin'] = $this->baseCodeRoute;
+        if (!isset($defaults['_teebb_admin'])) {
+            $defaults['_teebb_admin'] = $this->baseCodeRoute;
         }
 
-        $defaults['_sonata_name'] = $routeName;
+        $defaults['_teebb_name'] = $routeName;
 
         $this->elements[$name] = function () use (
             $pattern, $defaults, $requirements, $options, $host, $schemes, $methods, $condition) {

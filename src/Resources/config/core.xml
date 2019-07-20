@@ -10,6 +10,13 @@
             <argument type="collection"/>
         </service>
 
+        <service id="teebb.sbadmin2.route.admin_route_loader" class="Teebb\SBAdmin2Bundle\Route\AdminRouteLoader" public="true">
+            <argument type="service" id="teebb.sbadmin2.config"/>
+            <argument/>
+            <argument type="service" id="service_container"/>
+            <tag name="routing.loader"/>
+        </service>
+
         <!--twig global variables-->
         <service id="teebb.sbadmin2.twig.global" class="Teebb\SBAdmin2Bundle\Twig\GlobalVariables" public="true">
             <argument type="service" id="teebb.sbadmin2.config"/>

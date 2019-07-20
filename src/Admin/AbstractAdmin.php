@@ -3,8 +3,11 @@
 namespace Teebb\SBAdmin2Bundle\Admin;
 
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Teebb\SBAdmin2Bundle\Route\RouteBuilderInterface;
 use Teebb\SBAdmin2Bundle\Route\RouteCollection;
+use Teebb\SBAdmin2Bundle\Route\RouteGeneratorInterface;
 
 class AbstractAdmin implements AdminInterface
 {
@@ -66,6 +69,11 @@ class AbstractAdmin implements AdminInterface
     private $baseControllerName;
 
     /**
+     * @var Request
+     */
+    private $request;
+
+    /**
      * The route name prefix
      * @var string
      */
@@ -87,7 +95,6 @@ class AbstractAdmin implements AdminInterface
      */
     private $routes;
 
-
     /**
      * @var array
      */
@@ -95,11 +102,28 @@ class AbstractAdmin implements AdminInterface
         'routes' => false,
     ];
 
+    /**
+     * @var RouteBuilderInterface
+     */
+    protected $routeBuilder;
+
+    /**
+     * @var string
+     */
+    private  $translationDomain;
+
+    /**
+     * @var RouteGeneratorInterface
+     */
+    protected  $routeGenerator;
+
 
     public function __construct($adminServiceId, $entity, $baseControllerName)
     {
         $this->adminServiceId = $adminServiceId;
+
         $this->entity = $entity;
+
         $this->baseControllerName = $baseControllerName;
 
     }
@@ -118,8 +142,6 @@ class AbstractAdmin implements AdminInterface
         }
 
         $this->children[$child->getAdminServiceId()] = $child;
-
-        $this->setParent($this);
 
         $this->mapProperties[$this->adminServiceId] = $property;
 
@@ -160,8 +182,7 @@ class AbstractAdmin implements AdminInterface
      */
     public function setLabel(string $label): void
     {
-        if (empty($label))
-        {
+        if (empty($label)) {
             $this->label = get_class($this);
         }
 
@@ -176,10 +197,19 @@ class AbstractAdmin implements AdminInterface
         return $this->label;
     }
 
-
-    public function generateUrl($name, array $parameters = [], $absolute = UrlGeneratorInterface::ABSOLUTE_PATH)
+    public function setRequest(Request $request)
     {
+        return $this->request = $request;
+    }
 
+    public function getRequest()
+    {
+        return $this->request;
+    }
+
+    public function hasRequest()
+    {
+        return null !== $this->request;
     }
 
     public function isChild()
@@ -191,13 +221,22 @@ class AbstractAdmin implements AdminInterface
      * urlize the given word.
      *
      * @param string $word
-     * @param string $sep  the separator
+     * @param string $sep the separator
      *
      * @return string
      */
     public function urlize($word, $sep = '_')
     {
-        return strtolower(preg_replace('/[^a-z0-9_]/i', $sep.'$1', $word));
+        return strtolower(preg_replace('/[^a-z0-9_]/i', $sep . '$1', $word));
+    }
+
+    public function getBaseCodeRoute()
+    {
+        if ($this->isChild()) {
+            return $this->getParent()->getBaseCodeRoute() . '|' . $this->adminServiceId;
+        }
+
+        return $this->adminServiceId;
     }
 
     /**
@@ -239,7 +278,7 @@ class AbstractAdmin implements AdminInterface
             }
 
             $this->cachedBaseRouteName = sprintf('admin_%s%s_%s',
-                empty($matches[1]) ? '' : $this->urlize($matches[1]).'_',
+                empty($matches[1]) ? '' : $this->urlize($matches[1]) . '_',
                 $this->urlize($matches[3]),
                 $this->urlize($matches[5])
             );
@@ -247,5 +286,159 @@ class AbstractAdmin implements AdminInterface
 
         return $this->cachedBaseRouteName;
     }
+
+    /**
+     * Returns the baseRoutePattern used to generate the routing information.
+     *
+     * @throws \RuntimeException
+     *
+     * @return string the baseRoutePattern used to generate the routing information
+     */
+    public function getBaseRoutePattern()
+    {
+        if (null !== $this->cachedBaseRoutePattern) {
+            return $this->cachedBaseRoutePattern;
+        }
+
+        if ($this->isChild()) { // the admin class is a child, prefix it with the parent route pattern
+            $baseRoutePattern = $this->baseRoutePattern;
+            if (!$this->baseRoutePattern) {
+                preg_match(self::CLASS_REGEX, $this->entity, $matches);
+
+                if (!$matches) {
+                    throw new \RuntimeException(sprintf('Please define a default `baseRoutePattern` value for the admin class `%s`', \get_class($this)));
+                }
+                $baseRoutePattern = $this->urlize($matches[5], '-');
+            }
+
+            $this->cachedBaseRoutePattern = sprintf(
+                '%s/%s/%s',
+                $this->getParent()->getBaseRoutePattern(),
+                $this->getParent()->getRouterIdParameter(),
+                $baseRoutePattern
+            );
+        } elseif ($this->baseRoutePattern) {
+            $this->cachedBaseRoutePattern = $this->baseRoutePattern;
+        } else {
+            preg_match(self::CLASS_REGEX, $this->entity, $matches);
+
+            if (!$matches) {
+                throw new \RuntimeException(sprintf('Please define a default `baseRoutePattern` value for the admin class `%s`', \get_class($this)));
+            }
+
+            $this->cachedBaseRoutePattern = sprintf(
+                '/%s%s/%s',
+                empty($matches[1]) ? '' : $this->urlize($matches[1], '-') . '/',
+                $this->urlize($matches[3], '-'),
+                $this->urlize($matches[5], '-')
+            );
+        }
+
+        return $this->cachedBaseRoutePattern;
+    }
+
+    public function getRouterIdParameter()
+    {
+        return '{' . $this->getIdParameter() . '}';
+    }
+
+    public function getIdParameter()
+    {
+        $parameter = 'id';
+
+        for ($i = 0; $i < $this->getChildDepth(); ++$i) {
+            $parameter = 'child' . ucfirst($parameter);
+        }
+
+        return $parameter;
+    }
+
+    final public function getChildDepth()
+    {
+        $parent = $this;
+        $depth = 0;
+
+        while ($parent->isChild()) {
+            $parent = $parent->getParent();
+            ++$depth;
+        }
+
+        return $depth;
+    }
+
+    public function getBaseControllerName()
+    {
+        return $this->baseControllerName;
+    }
+
+    public function getRoutes()
+    {
+        $this->buildRoutes();
+
+        return $this->routes;
+    }
+
+    public function buildRoutes()
+    {
+        if ($this->loaded['routes']) {
+            return;
+        }
+
+        $this->loaded['routes'] = true;
+
+        $this->routes = new RouteCollection(
+            $this->getBaseCodeRoute(),
+            $this->getBaseRouteName(),
+            $this->getBaseRoutePattern(),
+            $this->getBaseControllerName()
+        );
+
+        $this->routeBuilder->build($this, $this->routes);
+    }
+
+    public function setRouteBuilder(RouteBuilderInterface $routeBuilder)
+    {
+        $this->routeBuilder = $routeBuilder;
+    }
+
+    public function getRouteBuilder()
+    {
+        return $this->routeBuilder;
+    }
+
+
+    public function setTranslationDomain(string $translationDomain)
+    {
+        $this->translationDomain = $translationDomain;
+    }
+
+    public function getTranslationDomain()
+    {
+        return $this->translationDomain;
+    }
+
+    public function generateUrl($name, array $parameters = [], $absolute = UrlGeneratorInterface::ABSOLUTE_PATH)
+    {
+        return $this->routeGenerator->generateUrl($this, $name, $parameters, $absolute);
+    }
+
+    public function generateMenuUrl($name, array $parameters = [], $absolute = UrlGeneratorInterface::ABSOLUTE_PATH)
+    {
+        return $this->routeGenerator->generateMenuUrl($this, $name, $parameters, $absolute);
+    }
+
+    public function setRouteGenerator(RouteGeneratorInterface $routeGenerator)
+    {
+        $this->routeGenerator = $routeGenerator;
+    }
+
+    /**
+     * @return RouteGeneratorInterface
+     */
+    public function getRouteGenerator()
+    {
+        return $this->routeGenerator;
+    }
+
 
 }

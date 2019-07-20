@@ -25,6 +25,7 @@ class TeebbSBAdmin2Extension extends Extension
             'core',
             'twig',
             'menu',
+            'route',
             'controller',
         ];
 

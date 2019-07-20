@@ -132,18 +132,17 @@ class MenuBuilder
     {
 
         if (isset($item['admin']) && !empty($item['admin']) && !isset($group['provider'])) {
-
             /** @var AbstractAdmin $admin */
             $admin = $this->sbadmin2Config->getInstance($item['admin']);
 
-//            $options = $admin->generateMenuUrl('list', [], $item['route_absolute']);
-//            $options['extras'] = [
-//                'label_catalogue' => $admin->getTranslationDomain(),
-//                'admin' => $admin,
-//            ];
+            $options = $admin->generateMenuUrl('list', [], $item['route_absolute']);
 
-            return $this->factory->createItem($admin->getLabel());
+            $options['extras'] = [
+                'label_catalogue' => $admin->getTranslationDomain(),
+                'admin' => $admin,
+            ];
 
+            return $this->factory->createItem($admin->getLabel(), $options);
         }
 
         return $this->factory->createItem($item['label'], [

@@ -154,7 +154,7 @@ class TeebbSBAdmin2Config implements TeebbSBAdmin2ConfigInterface
        return $this->templates[$templateName];
     }
 
-    public function getInstance(string $adminServiceId)
+    public function getInstance(string $adminServiceId): AdminInterface
     {
         if (!\in_array($adminServiceId, $this->adminServiceIds, true)) {
             $msg = sprintf('Admin service "%s" not found in admin pool.', $adminServiceId);
