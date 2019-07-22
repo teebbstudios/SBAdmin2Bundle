@@ -2,12 +2,15 @@
 
 namespace Teebb\SBAdmin2Bundle\Admin;
 
-
+use Knp\Menu\FactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Teebb\SBAdmin2Bundle\Route\RouteBuilderInterface;
 use Teebb\SBAdmin2Bundle\Route\RouteCollection;
 use Teebb\SBAdmin2Bundle\Route\RouteGeneratorInterface;
+use Teebb\SBAdmin2Bundle\Security\SecurityHandlerInterface;
+use Teebb\SBAdmin2Bundle\Translator\LabelTranslatorStrategyInterface;
 
 interface AdminInterface extends ParentAdminInterface
 {
@@ -77,7 +80,7 @@ interface AdminInterface extends ParentAdminInterface
      */
     public function setRequest(Request $request);
 
-    public function getRequest();
+    public function getRequest(): Request;
 
     public function hasRequest();
 
@@ -89,7 +92,7 @@ interface AdminInterface extends ParentAdminInterface
      * Generates a url for the given parameters.
      *
      * @param string $name
-     * @param int    $absolute
+     * @param int $absolute
      *
      * @return array return url parts: 'route', 'routeParameters', 'routeAbsolute'
      */
@@ -103,4 +106,50 @@ interface AdminInterface extends ParentAdminInterface
      * @return RouteGeneratorInterface
      */
     public function getRouteGenerator();
+
+    public function getMenuFactory(): FactoryInterface;
+
+    public function setMenuFactory($menuFactory): void;
+
+    public function getEntityClassLabel(): string;
+
+    public function setEntityClassLabel(string $entityClassLabel): void;
+
+    public function getEntityClass();
+
+    public function hasRoute($name);
+
+    public function getCrudConfigs(): array;
+
+    public function setCrudConfigs(array $crudConfigs): void;
+
+    public function getRest(): array;
+
+    public function setRest(array $rest): void;
+
+    public function hasAccess($action, $object = null): bool;
+
+    public function isGranted($name, $object = null);
+
+    public function getSecurityHandler(): SecurityHandlerInterface;
+
+    public function setSecurityHandler(SecurityHandlerInterface $securityHandler): void;
+
+    public function getSubject();
+
+    public function setSubject($subject): void;
+
+    public function hasSubject(): bool;
+
+    public function toString($object);
+
+    public function getCurrentChildAdmin();
+
+    public function getBoolCurrentChild();
+
+    public function setBoolCurrentChild(bool $boolCurrentChild);
+
+    public function getLabelTranslatorStrategy(): LabelTranslatorStrategyInterface;
+
+    public function setLabelTranslatorStrategy($labelTranslatorStrategy): void;
 }

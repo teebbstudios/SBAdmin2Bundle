@@ -3,18 +3,18 @@
            xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
     <services>
 
-        <service id="teebb_sbadmin2.route.path_info_builder" class="Teebb\SBAdmin2Bundle\Route\PathInfoBuilder" public="true" />
+        <service id="teebb.sbadmin2.route.path_info_builder" class="Teebb\SBAdmin2Bundle\Route\PathInfoBuilder" public="true" />
 
-        <service id="teebb_sbadmin2.route.default_route_generator" class="Teebb\SBAdmin2Bundle\Route\DefaultRouteGenerator" public="true">
+        <service id="teebb.sbadmin2.route.default_route_generator" class="Teebb\SBAdmin2Bundle\Route\DefaultRouteGenerator" public="true">
             <argument type="service" id="router"/>
-            <argument type="service" id="teebb_sbadmin2.route.routes_cache"/>
+            <argument type="service" id="teebb.sbadmin2.route.routes_cache"/>
         </service>
-        <service id="teebb_sbadmin2.route.routes_cache" class="Teebb\SBAdmin2Bundle\Route\RoutesCache" public="true">
+        <service id="teebb.sbadmin2.route.routes_cache" class="Teebb\SBAdmin2Bundle\Route\RoutesCache" public="true">
             <argument>%kernel.cache_dir%/sonata/admin</argument>
             <argument>%kernel.debug%</argument>
         </service>
         <service id="sonata.admin.route.cache_warmup" class="Teebb\SBAdmin2Bundle\Route\RoutesCacheWarmUp" public="true">
-            <argument type="service" id="teebb_sbadmin2.route.routes_cache"/>
+            <argument type="service" id="teebb.sbadmin2.route.routes_cache"/>
             <argument type="service" id="teebb.sbadmin2.config"/>
             <tag name="kernel.cache_warmer"/>
         </service>

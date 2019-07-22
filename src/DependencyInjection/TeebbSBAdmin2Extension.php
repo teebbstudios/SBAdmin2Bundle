@@ -26,6 +26,7 @@ class TeebbSBAdmin2Extension extends Extension
             'twig',
             'menu',
             'route',
+            'security',
             'controller',
         ];
 
@@ -48,16 +49,20 @@ class TeebbSBAdmin2Extension extends Extension
         $teebbSBAdmin2Config->replaceArgument(4, $config['options']);
 
         $container->setParameter('teebb.sbadmin2.configuration.default_label_catalogue', $config['options']['default_label_catalogue']);
+
         $container->setParameter('teebb.sbadmin2.configuration.default_icon', $config['options']['default_icon']);
 
         $container->setParameter('teebb.sbadmin2.configuration.dashboard_groups', $config['dashboard']['groups']);
+
         $container->setParameter('teebb.sbadmin2.configuration.dashboard_blocks', $config['dashboard']['blocks']);
 
         $container->setParameter('teebb.sbadmin2.configuration.templates', $config['templates']);
 
         $container->setParameter('teebb.sbadmin2.configuration.admins', $config['admins']);
 
+        $container->setParameter('teebb.sbadmin2.configuration.security', $config['security']);
 
+        $container->setParameter('teebb.admin.configuration.security.role_super_admin', $config['security']['role_super_admin']);
     }
 
     private function buildStylesheets($config): array

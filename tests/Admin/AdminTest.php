@@ -3,6 +3,7 @@
 namespace Teebb\SBAdmin2Bundle\Tests\Admin;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Teebb\SBAdmin2Bundle\Admin\BreadcrumbsBuilder;
 
 class AdminTest extends KernelTestCase
 {
@@ -15,31 +16,23 @@ class AdminTest extends KernelTestCase
 
     }
 
-    public function testMyFirstCase()
-    {
-
-        $articleAdmin = self::$container->get('App\Admin\ArticleAdmin');
-
-        $this->assertSame('Article', $articleAdmin->getLabel());
-
-        $categoryAdmin = self::$container->get('App\Admin\CategoryAdmin');
-
-        $this->assertTrue($categoryAdmin->hasChild('App\Admin\ArticleAdmin'));
-
-        $this->assertSame(null, $categoryAdmin->getParent());
-
-        $this->assertSame('Category', $articleAdmin->getParent()->getLabel());
-
-    }
-
-    public function testAdminRoutes()
+    public function testAdmins()
     {
         $articleAdmin = self::$container->get('App\Admin\ArticleAdmin');
 
+        $articleAdmin->initialize();
+
+        $this->assertSame('Article', $articleAdmin->getEntityClassLabel());
 
         $routes = $articleAdmin->getRoutes()->getElements();
 
-        var_dump($routes);
+        $this->assertArrayHasKey('create', $articleAdmin->getCrudConfigs());
+        $this->assertArrayHasKey('rest', $articleAdmin->getRest());
 
+        $breadcrumbsBuilder = new BreadcrumbsBuilder();
+
+        $breadcrumbs = $breadcrumbsBuilder->getBreadcrumbs($articleAdmin, 'list');
+
+        var_dump($breadcrumbs);
     }
 }

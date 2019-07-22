@@ -28,5 +28,17 @@
             <argument>%teebb.sbadmin2.configuration.templates%</argument>
         </service>
 
+        <!-- Services used to format the label, default is sonata.admin.label.strategy.noop -->
+        <service id="teebb.sbadmin2.label.strategy.bc" class="Teebb\SBAdmin2Bundle\Translator\BCLabelTranslatorStrategy" public="true"/>
+
+        <service id="teebb.sbadmin2.label.strategy.native" class="Teebb\SBAdmin2Bundle\Translator\NativeLabelTranslatorStrategy" public="true"/>
+
+        <service id="teebb.sbadmin2.label.strategy.noop" class="Teebb\SBAdmin2Bundle\Translator\NoopLabelTranslatorStrategy" public="true"/>
+
+        <service id="teebb.sbadmin2.label.strategy.underscore" class="Teebb\SBAdmin2Bundle\Translator\UnderscoreLabelTranslatorStrategy" public="true"/>
+
+        <service id="teebb.sbadmin2.label.strategy.form_component" class="Teebb\SBAdmin2Bundle\Translator\FormLabelTranslatorStrategy" public="true"/>
+
+
     </services>
 </container>

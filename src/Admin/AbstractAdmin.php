@@ -2,12 +2,14 @@
 
 namespace Teebb\SBAdmin2Bundle\Admin;
 
-
+use Knp\Menu\FactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Teebb\SBAdmin2Bundle\Route\RouteBuilderInterface;
 use Teebb\SBAdmin2Bundle\Route\RouteCollection;
 use Teebb\SBAdmin2Bundle\Route\RouteGeneratorInterface;
+use Teebb\SBAdmin2Bundle\Security\SecurityHandlerInterface;
+use Teebb\SBAdmin2Bundle\Translator\LabelTranslatorStrategyInterface;
 
 class AbstractAdmin implements AdminInterface
 {
@@ -25,75 +27,75 @@ class AbstractAdmin implements AdminInterface
      * Admin label, show in the menu.
      * @var string
      */
-    private $label;
+    protected $label;
 
     /**
      * Define a Collection of child admin, ie /admin/order/{id}/order-element/{childId}.
      *
      * @var array
      */
-    private $children = [];
+    protected $children = [];
 
     /**
      * Reference the parent collection.
      *
      * @var AdminInterface|null
      */
-    private $parent = null;
+    protected $parent = null;
 
     /**
      * Current admin service id.
      *
      * @var string
      */
-    private $adminServiceId;
+    protected $adminServiceId;
 
     /**
      * Current admin map the parent admin entity properties;
      * @var array | null
      */
-    private $mapProperties = null;
+    protected $mapProperties = null;
 
     /**
      * Current admin manage the entity object.
      *
      * @var string
      */
-    private $entity;
+    protected $entity;
 
     /**
      * The base name controller used to generate the routing information.
      *
      * @var string
      */
-    private $baseControllerName;
+    protected $baseControllerName;
 
     /**
      * @var Request
      */
-    private $request;
+    protected $request;
 
     /**
      * The route name prefix
      * @var string
      */
-    private $baseRouteName;
+    protected $baseRouteName;
 
-    private $cachedBaseRouteName;
+    protected $cachedBaseRouteName;
 
     /**
      * @var string
      */
-    private $baseRoutePattern;
+    protected $baseRoutePattern;
 
-    private $cachedBaseRoutePattern;
+    protected $cachedBaseRoutePattern;
 
     /**
      * Array of routes related to this admin.
      *
      * @var RouteCollection
      */
-    private $routes;
+    protected $routes;
 
     /**
      * @var array
@@ -110,13 +112,59 @@ class AbstractAdmin implements AdminInterface
     /**
      * @var string
      */
-    private  $translationDomain;
+    protected $translationDomain;
 
     /**
      * @var RouteGeneratorInterface
      */
-    protected  $routeGenerator;
+    protected $routeGenerator;
 
+    /**
+     * @var FactoryInterface
+     */
+    protected $menuFactory;
+
+    /**
+     * @var string
+     */
+    protected $entityClassLabel;
+
+    /**
+     * The admin create edit list delete configs
+     * @var array
+     */
+    protected $crudConfigs;
+
+    /**
+     * The admin rest settings
+     * @var array
+     */
+    protected $rest;
+
+    /**
+     * @var SecurityHandlerInterface
+     */
+    protected $securityHandler;
+
+    protected $cacheIsGranted = [];
+
+    /**
+     * The subject only set in edit/update/create mode.
+     *
+     * @var object|null
+     */
+    protected $subject;
+
+    /**
+     * The children Admin is current
+     * @var bool
+     */
+    protected $boolCurrentChild;
+
+    /**
+     * @var LabelTranslatorStrategyInterface
+     */
+    protected $labelTranslatorStrategy;
 
     public function __construct($adminServiceId, $entity, $baseControllerName)
     {
@@ -125,7 +173,11 @@ class AbstractAdmin implements AdminInterface
         $this->entity = $entity;
 
         $this->baseControllerName = $baseControllerName;
+    }
 
+    public function getEntityClass()
+    {
+        return $this->entity;
     }
 
     public function addChild(AdminInterface $child, string $property)
@@ -202,7 +254,7 @@ class AbstractAdmin implements AdminInterface
         return $this->request = $request;
     }
 
-    public function getRequest()
+    public function getRequest(): Request
     {
         return $this->request;
     }
@@ -438,6 +490,208 @@ class AbstractAdmin implements AdminInterface
     public function getRouteGenerator()
     {
         return $this->routeGenerator;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMenuFactory(): FactoryInterface
+    {
+        return $this->menuFactory;
+    }
+
+    /**
+     * @param mixed $menuFactory
+     */
+    public function setMenuFactory($menuFactory): void
+    {
+        $this->menuFactory = $menuFactory;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEntityClassLabel(): string
+    {
+        return $this->entityClassLabel;
+    }
+
+    /**
+     * @param string $entityClassLabel
+     */
+    public function setEntityClassLabel(string $entityClassLabel): void
+    {
+        $this->entityClassLabel = $entityClassLabel;
+    }
+
+    /**
+     * define custom variable.
+     */
+    public function initialize()
+    {
+        if (!$this->entityClassLabel) {
+            $this->entityClassLabel = substr(
+                (string)$this->getEntityClass(),
+                strrpos($this->getEntityClass(), '\\') + 1
+            );
+        }
+    }
+
+    public function hasRoute($name)
+    {
+        if (!$this->routeGenerator) {
+            throw new \RuntimeException('RouteGenerator cannot be null');
+        }
+
+        return $this->routeGenerator->hasAdminRoute($this, $name);
+    }
+
+    /**
+     * @return array
+     */
+    public function getCrudConfigs(): array
+    {
+        return $this->crudConfigs;
+    }
+
+    /**
+     * @param array $crudConfigs
+     */
+    public function setCrudConfigs(array $crudConfigs): void
+    {
+        $this->crudConfigs = $crudConfigs;
+    }
+
+    /**
+     * @return array
+     */
+    public function getRest(): array
+    {
+        return $this->rest;
+    }
+
+    /**
+     * @param array $rest
+     */
+    public function setRest(array $rest): void
+    {
+        $this->rest = $rest;
+    }
+
+    /**
+     * @return SecurityHandlerInterface
+     */
+    public function getSecurityHandler(): SecurityHandlerInterface
+    {
+        return $this->securityHandler;
+    }
+
+    /**
+     * @param SecurityHandlerInterface $securityHandler
+     */
+    public function setSecurityHandler(SecurityHandlerInterface $securityHandler): void
+    {
+        $this->securityHandler = $securityHandler;
+    }
+
+    public function isGranted($name, $object = null)
+    {
+        $key = md5(json_encode($name) . ($object ? '/' . spl_object_hash($object) : ''));
+
+        if (!\array_key_exists($key, $this->cacheIsGranted)) {
+            $this->cacheIsGranted[$key] = $this->securityHandler->isGranted($this, $name, $object ?: $this);
+        }
+
+        return $this->cacheIsGranted[$key];
+    }
+
+    public function hasAccess($action, $object = null): bool
+    {
+        if (!\array_key_exists($action, $this->crudConfigs)) {
+            return false;
+        }
+
+        foreach ($this->crudConfigs[$action]['permission']['roles'] as $role) {
+            if (false === $this->isGranted($role, $object)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @return object|null
+     */
+    public function getSubject()
+    {
+        return $this->subject;
+    }
+
+    /**
+     * @param object|null $subject
+     */
+    public function setSubject($subject): void
+    {
+        $this->subject = $subject;
+    }
+
+    public function hasSubject(): bool
+    {
+        return (bool)$this->getSubject();
+    }
+
+    public function toString($object)
+    {
+        if (!\is_object($object)) {
+            return '';
+        }
+
+        if (method_exists($object, '__toString') && null !== $object->__toString()) {
+            return (string)$object;
+        }
+
+        return sprintf('%s:%s', get_class($object), spl_object_hash($object));
+    }
+
+    /**
+     * Returns the current child admin instance.
+     *
+     * @return AdminInterface|null the current child admin instance
+     */
+    public function getCurrentChildAdmin()
+    {
+        foreach ($this->children as $children) {
+            if ($children->getBoolCurrentChild()) {
+                return $children;
+            }
+        }
+    }
+
+    public function getBoolCurrentChild()
+    {
+        return $this->boolCurrentChild;
+    }
+
+    public function setBoolCurrentChild(bool $boolCurrentChild)
+    {
+        $this->boolCurrentChild = $boolCurrentChild;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLabelTranslatorStrategy(): LabelTranslatorStrategyInterface
+    {
+        return $this->labelTranslatorStrategy;
+    }
+
+    /**
+     * @param mixed $labelTranslatorStrategy
+     */
+    public function setLabelTranslatorStrategy($labelTranslatorStrategy): void
+    {
+        $this->labelTranslatorStrategy = $labelTranslatorStrategy;
     }
 
 

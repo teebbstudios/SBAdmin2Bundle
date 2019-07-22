@@ -18,6 +18,8 @@ class AdminServicesCompilePass implements CompilerPassInterface
 
         $configAdmins = $container->getParameter('teebb.sbadmin2.configuration.admins');
 
+        $security = $container->getParameter('teebb.sbadmin2.configuration.security');
+
         $dashboardGroupsSettings = $container->getParameter('teebb.sbadmin2.configuration.dashboard_groups');
 
         foreach ($configAdmins as $adminServiceId => $adminConfig) {
@@ -36,13 +38,34 @@ class AdminServicesCompilePass implements CompilerPassInterface
             $definition->setArguments($arguments);
             $definition->setPublic(true);
 
+            $definition->addMethodCall('initialize');
+
             $definition->addMethodCall('setLabel', [$adminConfig['label']]);
             $definition->addMethodCall('setTranslationDomain', [$adminConfig['label_catalogue']]);
 
             //Set routeBuilder
-            $definition->addMethodCall('setRouteBuilder', [new Reference('teebb_sbadmin2.route.path_info_builder')]);
+            $definition->addMethodCall('setRouteBuilder', [new Reference('teebb.sbadmin2.route.path_info_builder')]);
             //Set UrlGenerator
-            $definition->addMethodCall('setRouteGenerator', [new Reference('teebb_sbadmin2.route.default_route_generator')]);
+            $definition->addMethodCall('setRouteGenerator', [new Reference('teebb.sbadmin2.route.default_route_generator')]);
+            //Set Menu factory
+            $definition->addMethodCall('setMenuFactory', [new Reference('knp_menu.factory')]);
+
+            //Set Security handler
+            $definition->addMethodCall('setSecurityHandler', [new Reference($security['handler'])]);
+
+            //Set Translate strategy
+            $definition->addMethodCall('setLabelTranslatorStrategy', [new Reference('teebb.sbadmin2.label.strategy.native')]);
+
+            //Set CRUD configs;
+            $crudSettings['create'] = $adminConfig['create'];
+            $crudSettings['edit'] = $adminConfig['edit'];
+            $crudSettings['delete'] = $adminConfig['delete'];
+            $crudSettings['list'] = $adminConfig['list'];
+            $definition->addMethodCall('setCrudConfigs', [$crudSettings]);
+
+            //Set Rest configs;
+            $restSettings['rest'] = $adminConfig['rest'];
+            $definition->addMethodCall('setRest', [$restSettings]);
 
             //If children Admin exits, add children Admin and set parent Admin.
             if (array_key_exists('children', $adminConfig) && array_key_exists('map_property', $adminConfig)) {
@@ -60,7 +83,7 @@ class AdminServicesCompilePass implements CompilerPassInterface
 
 
             if (!isset($configAdminGroups[$adminConfig['group']][$adminConfig['label']])) {
-                if (!$adminConfig['hide_sidebar']){
+                if (!$adminConfig['hide_sidebar']) {
                     $configAdminGroups[$adminConfig['group']][$adminConfig['label']] = [
                         'label' => $adminConfig['label'],
                         'label_catalogue' => $labelCatalogue,

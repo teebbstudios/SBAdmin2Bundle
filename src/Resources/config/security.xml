@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <parameters>
+        <parameter key="teebb.sbadmin2.security.handler.noop.class">Teebb\SBAdmin2Bundle\Security\NoopSecurityHandler</parameter>
+        <parameter key="teebb.sbadmin2.security.handler.role.class">Teebb\SBAdmin2Bundle\Security\RoleSecurityHandler</parameter>
+    </parameters>
+    <services>
+        <service id="teebb.sbadmin2.security.handler.noop" class="%teebb.sbadmin2.security.handler.noop.class%" public="false"/>
+        <service id="teebb.sbadmin2.security.handler.role" class="%teebb.sbadmin2.security.handler.role.class%" public="false">
+            <argument type="service" id="security.authorization_checker"/>
+            <argument type="collection">
+                <argument>%teebb.admin.configuration.security.role_super_admin%</argument>
+            </argument>
+        </service>
+    </services>
+</container>

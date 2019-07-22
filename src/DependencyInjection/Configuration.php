@@ -28,11 +28,19 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('favicon')->defaultValue('bundles/teebbsbadmin2/img/favicon.ico')->cannotBeEmpty()->end()
             ->end();
 
-        $this->addDesignSection($rootNode);
-        $this->addOptionsSection($rootNode);
-        $this->addAssetsSection($rootNode);
-        $this->addTemplatesSection($rootNode);
+        $this->addSecuritySection($rootNode);
+
+        $this->addAdminsConfigSection($rootNode);
+
         $this->addDashboardSection($rootNode);
+
+        $this->addDesignSection($rootNode);
+
+        $this->addTemplatesSection($rootNode);
+        $this->addAssetsSection($rootNode);
+
+        $this->addOptionsSection($rootNode);
+
         $this->addAdminsSection($rootNode);
 
         return $treeBuilder;
@@ -46,6 +54,39 @@ class Configuration implements ConfigurationInterface
                     ->children()
                         ->scalarNode('sidebar_bg_class')->info('Left side background class.')
                             ->defaultValue('bg-gradient-primary')
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addSecuritySection(ArrayNodeDefinition $rootNode){
+        $rootNode
+            ->children()
+                ->arrayNode('security')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('handler')->info('The admin security handler.')
+                            ->defaultValue('teebb.sbadmin2.security.handler.noop')
+                        ->end()
+                        ->scalarNode('role_super_admin')->info('The super admin role.')
+                            ->defaultValue('ROLE_SUPER_ADMIN')
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    private function addAdminsConfigSection(ArrayNodeDefinition $rootNode){
+        $rootNode
+            ->children()
+                ->arrayNode('admin_configs')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('translator_strategy')->info('The admin label translator strategy service id.')
+                            ->defaultValue('teebb.sbadmin2.label.strategy.native')
                         ->end()
                     ->end()
                 ->end()
@@ -287,7 +328,7 @@ class Configuration implements ConfigurationInterface
                             ->scalarNode('icon')->defaultValue('fa-folder')->end()
                             ->integerNode('priority')->defaultValue(0)->end()
                             ->arrayNode('roles')
-                                    ->prototype('scalar')->defaultValue([])->end()
+                                ->prototype('scalar')->defaultValue([])->end()
                             ->end()
 
                             ->scalarNode('children')->cannotBeEmpty()->info('The admin children admin for general route.')->end()
@@ -302,8 +343,73 @@ class Configuration implements ConfigurationInterface
                                     ->scalarNode('link_icon')->defaultValue('fa-plus-circle')->end()
                                 ->end()
                             ->end()
+
+                            ->arrayNode('rest')
+                                ->arrayPrototype()
+                                    ->children()
+                                        ->scalarNode('group')->end()
+                                        ->arrayNode('roles')
+                                            ->prototype('scalar')->defaultValue([])->end()
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+
+                            ->arrayNode('create')
+                                ->children()
+                                    ->arrayNode('permission')
+                                        ->children()
+                                            ->scalarNode('name')->info('Permission Name')->end()
+                                            ->scalarNode('description')->end()
+                                            ->arrayNode('roles')->info('The roles have this permission.')
+                                                ->scalarPrototype()->defaultValue([])->end()
+                                            ->end()
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+
+                            ->arrayNode('edit')
+                                ->children()
+                                    ->arrayNode('permission')
+                                        ->children()
+                                            ->scalarNode('name')->info('Permission Name')->end()
+                                            ->scalarNode('description')->end()
+                                            ->arrayNode('roles')->info('The roles have this permission.')
+                                                ->scalarPrototype()->defaultValue([])->end()
+                                            ->end()
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+
+                            ->arrayNode('delete')
+                                ->children()
+                                    ->arrayNode('permission')
+                                        ->children()
+                                            ->scalarNode('name')->info('Permission Name')->end()
+                                            ->scalarNode('description')->end()
+                                            ->arrayNode('roles')->info('The roles have this permission.')
+                                                ->scalarPrototype()->defaultValue([])->end()
+                                            ->end()
+                                        ->end()
+                                    ->end()
+                                ->end()
+                            ->end()
+
                             ->arrayNode('list')->info('Entity list config.')
                                 ->children()
+                                    ->arrayNode('permission')
+                                        ->children()
+                                            ->scalarNode('name')->info('Permission Name')->end()
+                                            ->scalarNode('description')->end()
+                                            ->arrayNode('roles')->info('The roles have this permission.')
+                                                ->scalarPrototype()
+                                                    ->defaultValue([])
+                                                ->end()
+                                            ->end()
+                                        ->end()
+                                    ->end()
 
                                     ->arrayNode('fields')->info('Config the entity field to show in the list.')
                                         ->arrayPrototype()
@@ -322,7 +428,12 @@ class Configuration implements ConfigurationInterface
                                                 ->scalarNode('label')->end()
                                                 ->scalarNode('icon')->end()
                                                 ->scalarNode('class')->end()
-                                                ->enumNode('type')->defaultValue('item')->values(['item','group'])->end()
+                                                ->enumNode('type')->defaultValue('item')->values(['item','group'])->info('The action button style.')->end()
+                                                ->arrayNode('roles')
+                                                    ->scalarPrototype()
+                                                        ->defaultValue([])
+                                                    ->end()
+                                                ->end()
                                             ->end()
                                         ->end()
                                     ->end()
@@ -333,6 +444,11 @@ class Configuration implements ConfigurationInterface
                                                 ->scalarNode('property')->info('The property')->end()
                                                 ->scalarNode('label')->info('The label')->end()
                                                 ->scalarNode('type')->info('The property form field type.Default guess field type.')->end()
+                                                ->arrayNode('roles')
+                                                    ->scalarPrototype()
+                                                        ->defaultValue([])
+                                                    ->end()
+                                                ->end()
                                             ->end()
                                         ->end()
                                     ->end()
@@ -343,6 +459,11 @@ class Configuration implements ConfigurationInterface
                                                 ->scalarNode('action')->info('The batch option name.')->end()
                                                 ->scalarNode('option_name')->info('The option syntax name.')->end()
                                                 ->scalarNode('option_label')->info('The option syntax value.')->end()
+                                                ->arrayNode('roles')
+                                                    ->scalarPrototype()
+                                                        ->defaultValue([])
+                                                    ->end()
+                                                ->end()
                                             ->end()
                                         ->end()
                                     ->end()
