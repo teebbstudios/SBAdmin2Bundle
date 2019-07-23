@@ -13,5 +13,13 @@
             </call>
         </service>
 
+        <service id="Teebb\SBAdmin2Bundle\Controller\CRUDController">
+            <tag name="controller.service_arguments"/>
+            <call method="setContainer">
+                <argument type="service" id="service_container"/>
+            </call>
+            <call method="configure"/>
+        </service>
+
     </services>
 </container>

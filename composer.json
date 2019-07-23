@@ -19,6 +19,7 @@
         "ext-zip": "*",
         "ext-json": "*",
         "sonata-project/block-bundle": "^3.15",
+        "friendsofsymfony/rest-bundle": "^2.5",
         "symfony/asset": "^3.4 || ^4.0",
         "symfony/config": "^3.4 || ^4.0",
         "symfony/dependency-injection": "^3.4 || ^4.0",
@@ -30,6 +31,7 @@
         "symfony/options-resolver": "^3.4 || ^4.0",
         "symfony/property-access": "^3.4 || ^4.0",
         "symfony/routing": "^3.4 || ^4.0",
+        "symfony/serializer-pack": "*",
         "symfony/twig-bundle": "^3.4 || ^4.0",
         "twig/twig": "^2.0"
     },

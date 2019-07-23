@@ -37,4 +37,6 @@ interface TeebbSBAdmin2ConfigInterface
     public function getTemplate(string $templateName): string;
 
     public function getInstance(string $adminServiceId): AdminInterface;
+
+    public function getAdminByAdminCode($adminCode);
 }

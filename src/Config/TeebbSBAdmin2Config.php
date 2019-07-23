@@ -193,4 +193,68 @@ class TeebbSBAdmin2Config implements TeebbSBAdmin2ConfigInterface
         return $admin;
     }
 
+    /**
+     * Returns an admin class by its Admin code
+     * ie : sonata.news.admin.post|sonata.news.admin.comment => return the child class of post.
+     *
+     * @param string $adminCode
+     *
+     * @throws \InvalidArgumentException if the root admin code is an empty string
+     *
+     * @return AdminInterface|false
+     */
+    public function getAdminByAdminCode($adminCode)
+    {
+        if (!\is_string($adminCode)) {
+            @trigger_error(sprintf(
+                'Passing a non string value as argument 1 for %s() is deprecated since sonata-project/admin-bundle 3.51 and will throw an exception in 4.0.',
+                __METHOD__
+            ), E_USER_DEPRECATED);
+
+            return false;
+
+            // NEXT_MAJOR : remove this condition check and declare "string" as type without default value for argument 1
+        }
+        $codes = explode('|', $adminCode);
+        $code = trim(array_shift($codes));
+
+        if ('' === $code) {
+            throw new \InvalidArgumentException('Root admin code must contain a valid admin reference, empty string given.');
+        }
+
+        $admin = $this->getInstance($code);
+
+        foreach ($codes as $code) {
+            if (!\in_array($code, $this->adminServiceIds, true)) {
+                @trigger_error(sprintf(
+                    'Passing an invalid admin code as argument 1 for %s() is deprecated since sonata-project/admin-bundle 3.50 and will throw an exception in 4.0.',
+                    __METHOD__
+                ), E_USER_DEPRECATED);
+
+                // NEXT_MAJOR : throw `\InvalidArgumentException` instead
+            }
+
+            if (!$admin->hasChild($code)) {
+                @trigger_error(sprintf(
+                    'Passing an invalid admin hierarchy inside argument 1 for %s() is deprecated since sonata-project/admin-bundle 3.51 and will throw an exception in 4.0.',
+                    __METHOD__
+                ), E_USER_DEPRECATED);
+
+                // NEXT_MAJOR : remove the previous `trigger_error()` call, uncomment the following excception and declare AdminInterface as return type
+                // throw new InvalidArgumentException(sprintf(
+                //    'Argument 1 passed to %s() must contain a valid admin hierarchy, "%s" is not a valid child for "%s"',
+                //    __METHOD__,
+                //    $code,
+                //    $admin->getCode()
+                // ));
+
+                return false;
+            }
+
+            $admin = $admin->getChild($code);
+        }
+
+        return $admin;
+    }
+
 }

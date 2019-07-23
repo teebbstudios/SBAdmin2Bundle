@@ -136,6 +136,7 @@ class AdminServicesCompilePass implements CompilerPassInterface
         $adminRouteLoaderDefinition->setArgument(1, $adminServiceIds);
 
         $templates = $container->getParameter('teebb.sbadmin2.configuration.templates');
+
         $sbadmin2ConfigDefinition->addMethodCall('setTemplates', [$templates]);
 
     }

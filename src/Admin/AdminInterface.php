@@ -5,7 +5,6 @@ namespace Teebb\SBAdmin2Bundle\Admin;
 use Knp\Menu\FactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Teebb\SBAdmin2Bundle\Route\RouteBuilderInterface;
 use Teebb\SBAdmin2Bundle\Route\RouteCollection;
 use Teebb\SBAdmin2Bundle\Route\RouteGeneratorInterface;
@@ -152,4 +151,6 @@ interface AdminInterface extends ParentAdminInterface
     public function getLabelTranslatorStrategy(): LabelTranslatorStrategyInterface;
 
     public function setLabelTranslatorStrategy($labelTranslatorStrategy): void;
+
+    public function checkAccess($action, $object = null);
 }

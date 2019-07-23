@@ -5,6 +5,7 @@ namespace Teebb\SBAdmin2Bundle\Admin;
 use Knp\Menu\FactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Teebb\SBAdmin2Bundle\Route\RouteBuilderInterface;
 use Teebb\SBAdmin2Bundle\Route\RouteCollection;
 use Teebb\SBAdmin2Bundle\Route\RouteGeneratorInterface;
@@ -694,5 +695,21 @@ class AbstractAdmin implements AdminInterface
         $this->labelTranslatorStrategy = $labelTranslatorStrategy;
     }
 
+    public function checkAccess($action, $object = null)
+    {
+        if (!\array_key_exists($action, $this->crudConfigs)) {
+            throw new \InvalidArgumentException(sprintf(
+                'Action "%s" could not be found in access mapping.'
+                .' Please make sure your action is defined into your admin class accessMapping property.',
+                $action
+            ));
+        }
+
+        foreach ($this->crudConfigs[$action]['permission']['roles'] as $role) {
+            if (false === $this->isGranted($role, $object)) {
+                throw new AccessDeniedException(sprintf('Access Denied to the action %s and role %s', $action, $role));
+            }
+        }
+    }
 
 }
