@@ -1,0 +1,43 @@
+{% extends 'bootstrap_4_layout.html.twig' %}
+
+{%- block form_start -%}
+    {%- do form.setMethodRendered() -%}
+    {% set method = method|upper %}
+    {%- if method in ["GET", "POST"] -%}
+        {% set form_method = method %}
+    {%- else -%}
+        {% set form_method = "POST" %}
+    {%- endif -%}
+    <form{% if name != '' %} name="{{ name }}"{% endif %} method="{{ form_method|lower }}"{% if action != '' %} action="{{ action }}"{% endif %} {% if multipart %} enctype="multipart/form-data"{% endif %}>
+    {%- if form_method != method -%}
+        <input type="hidden" name="_method" value="{{ method }}" />
+    {%- endif -%}
+{%- endblock form_start -%}
+
+{%- block form_row -%}
+    {%- if compound is defined and compound -%}
+        {%- set element = 'fieldset' -%}
+    {%- endif -%}
+    {%- set widget_attr = {} -%}
+    {%- if help is not empty -%}
+        {%- set widget_attr = {attr: {'aria-describedby': id ~"_help"}} -%}
+    {%- endif -%}
+    <{{ element|default('div') }} class="form-group {% for attrname, attrvalue in form.vars.attr -%}{%- if attrname == 'row_class' -%}{{ attrvalue }}{%- endif -%}{%- endfor %} ">
+    {{- form_label(form) -}}
+    {{- form_widget(form, widget_attr) -}}
+    {{- form_help(form) -}}
+    </{{ element|default('div') }}>
+{%- endblock form_row -%}
+
+{% block button_row -%}
+    <div class="form-group {% for attrname, attrvalue in form.vars.attr -%}{%- if attrname == 'row_class' -%}{{ attrvalue }}{%- endif -%}{%- endfor %} ">
+        {{- form_widget(form) -}}
+    </div>
+{%- endblock button_row %}
+
+{%- block teebb_admin_filter_button_widget -%}
+    <button class="btn btn-secondary btn-icon-split btn-sm">
+        <span class="icon text-white-50"><i class="fas fa-filter"></i></span>
+        <span class="text">{{ 'Filter'|trans({}, 'TeebbSBAdmin2Bundle') }}</span>
+    </button>
+{%- endblock -%}

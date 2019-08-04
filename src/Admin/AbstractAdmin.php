@@ -2,10 +2,21 @@
 
 namespace Teebb\SBAdmin2Bundle\Admin;
 
+use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Knp\Menu\FactoryInterface;
+use Symfony\Component\Form\Extension\Core\Type\FormType;
+use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormRegistryInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Teebb\SBAdmin2Bundle\Exception\FilterPropertyNotFoundException;
+use Teebb\SBAdmin2Bundle\Form\Type\FilterButtonType;
 use Teebb\SBAdmin2Bundle\Route\RouteBuilderInterface;
 use Teebb\SBAdmin2Bundle\Route\RouteCollection;
 use Teebb\SBAdmin2Bundle\Route\RouteGeneratorInterface;
@@ -167,6 +178,26 @@ class AbstractAdmin implements AdminInterface
      */
     protected $labelTranslatorStrategy;
 
+    /**
+     * @var EntityManagerInterface
+     */
+    protected $objectManager;
+
+    /**
+     * @var FormFactoryInterface
+     */
+    protected $formFactory;
+
+    /**
+     * @var FormRegistryInterface
+     */
+    protected $formRegistry;
+
+    /**
+     * @var PropertyAccessorInterface
+     */
+    protected $propertyAccessor;
+
     public function __construct($adminServiceId, $entity, $baseControllerName)
     {
         $this->adminServiceId = $adminServiceId;
@@ -295,9 +326,9 @@ class AbstractAdmin implements AdminInterface
     /**
      * Returns the baseRouteName used to generate the routing information.
      *
+     * @return string the baseRouteName used to generate the routing information
      * @throws \RuntimeException
      *
-     * @return string the baseRouteName used to generate the routing information
      */
     public function getBaseRouteName()
     {
@@ -343,9 +374,9 @@ class AbstractAdmin implements AdminInterface
     /**
      * Returns the baseRoutePattern used to generate the routing information.
      *
+     * @return string the baseRoutePattern used to generate the routing information
      * @throws \RuntimeException
      *
-     * @return string the baseRoutePattern used to generate the routing information
      */
     public function getBaseRoutePattern()
     {
@@ -613,6 +644,8 @@ class AbstractAdmin implements AdminInterface
         }
 
         foreach ($this->crudConfigs[$action]['permission']['roles'] as $role) {
+            dd($role);
+
             if (false === $this->isGranted($role, $object)) {
                 return false;
             }
@@ -695,12 +728,81 @@ class AbstractAdmin implements AdminInterface
         $this->labelTranslatorStrategy = $labelTranslatorStrategy;
     }
 
+    /**
+     * @return ObjectManager
+     */
+    public function getObjectManager(): ObjectManager
+    {
+        return $this->objectManager;
+    }
+
+    /**
+     * @param ObjectManager $objectManager
+     */
+    public function setObjectManager(ObjectManager $objectManager): void
+    {
+        $this->objectManager = $objectManager;
+    }
+
+    /**
+     * @return FormFactoryInterface
+     */
+    public function getFormFactory(): FormFactoryInterface
+    {
+        return $this->formFactory;
+    }
+
+    /**
+     * @param FormFactoryInterface $formFactory
+     */
+    public function setFormFactory(FormFactoryInterface $formFactory): void
+    {
+        $this->formFactory = $formFactory;
+    }
+
+    /**
+     * @return FormRegistryInterface
+     */
+    public function getFormRegistry(): FormRegistryInterface
+    {
+        return $this->formRegistry;
+    }
+
+    /**
+     * @param FormRegistryInterface $formRegistry
+     */
+    public function setFormRegistry(FormRegistryInterface $formRegistry): void
+    {
+        $this->formRegistry = $formRegistry;
+    }
+
+    /**
+     * @return PropertyAccessorInterface
+     */
+    public function getPropertyAccessor(): PropertyAccessorInterface
+    {
+        return $this->propertyAccessor;
+    }
+
+    /**
+     * @param PropertyAccessorInterface $propertyAccessor
+     */
+    public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor): void
+    {
+        $this->propertyAccessor = $propertyAccessor;
+    }
+
+    /**
+     * Check the crud permission.
+     * @param $action : The crud action
+     * @param null $object
+     */
     public function checkAccess($action, $object = null)
     {
         if (!\array_key_exists($action, $this->crudConfigs)) {
             throw new \InvalidArgumentException(sprintf(
                 'Action "%s" could not be found in access mapping.'
-                .' Please make sure your action is defined into your admin class accessMapping property.',
+                . ' Please make sure your action is defined into your admin class accessMapping property.',
                 $action
             ));
         }
@@ -711,5 +813,120 @@ class AbstractAdmin implements AdminInterface
             }
         }
     }
+
+    public function getResults()
+    {
+        return $this->objectManager->getRepository($this->entity)->findAll();
+    }
+
+    public function getConditionalQueryResults(array $condition, array $orders = null)
+    {
+        $qb = $this->objectManager->createQueryBuilder();
+
+        $queryBuilder = $qb->select('o')
+            ->from($this->entity, 'o');
+
+        $metaData = $this->objectManager->getMetadataFactory()->getMetadataFor($this->entity);
+
+        foreach ($condition as $filterName => $filterValue) {
+            switch ($metaData->getTypeOfField($filterName)) {
+                case 'string':
+                    if (!empty($filterValue)) {
+                        $where = $qb->expr()->like('o.' . $filterName, ':' . $filterName);
+                        $queryBuilder->andWhere($where)->setParameter($filterName, '%' . $filterValue . '%');
+                    }
+                    break;
+                case 'integer':
+                    if (!empty($filterValue)) {
+                        $where = $qb->expr()->eq('o.' . $filterName, ':' . $filterName);
+                        $queryBuilder->andWhere($where)->setParameter($filterName, $filterValue);
+                    }
+                    break;
+            }
+        }
+
+        return $queryBuilder->getQuery();
+    }
+
+    public function getAccessFilterProperties(): array
+    {
+        $filters = $this->crudConfigs['list']['filters'];
+        $filterProperties = [];
+        foreach ($filters as $filter) {
+            if (property_exists(new $this->entity, $filter['property'])) {
+                array_push($filterProperties, $filter);
+            }
+        }
+        return $filterProperties;
+    }
+
+    public function getListProperties(): array
+    {
+        $fields = $this->crudConfigs['list']['fields'];
+        $fieldsArray = [];
+        foreach ($fields as $field) {
+            if (property_exists(new $this->entity, $field['property'])) {
+                array_push($fieldsArray, $field);
+            }
+        }
+        return $fieldsArray;
+    }
+
+    public function getListItemActions(): array
+    {
+        $actions = $this->crudConfigs['list']['actions'];
+
+        $actionsArray = [];
+        foreach ($actions as $action) {
+
+            if ($this->hasRoute($action['name'])) {
+                array_push($actionsArray, $action);
+            } else {
+                throw new \Exception(
+                    sprintf('The list item action %s not found. Check the %s configure list actions name.', $action['name'], $this->getAdminServiceId())
+                );
+            }
+        }
+        return $actionsArray;
+    }
+
+    public function getListFilterForm(): FormInterface
+    {
+        if (empty($filters = $this->crudConfigs['list']['filters'])) {
+            return null;
+        }
+
+        $formBuilder = $this->formFactory->createNamedBuilder('filter', FormType::class, null, ['csrf_protection' => false, 'allow_extra_fields' => true]);
+        $formBuilder->setMethod('get');
+
+        $typeGuesser = $this->formRegistry->getTypeGuesser();
+
+        foreach ($filters as $filter) {
+            if (empty($filter['roles']) || $this->isGranted($filter['roles'])) {
+                if (!property_exists(new $this->entity, $filter['property'])) {
+                    throw new FilterPropertyNotFoundException(sprintf('The filter property %s not found in class %s. Please check the admin config files.', $filter['property'], $this->entity));
+                }
+                $type = $typeGuesser->guessType($this->entity, $filter['property'])->getType();
+
+                $options = array(
+                    'required' => false,
+                    'label_attr' => [
+                        'class' => 'sr-only',
+                    ],
+                    'translation_domain' => $this->translationDomain,
+                    'attr' => [
+                        'class' => 'form-control-sm',
+                        'placeholder' => $filter['property'],
+                    ],
+                );
+
+                $formBuilder->add($filter['property'], $filter['type'] ?? $type, array_merge_recursive($options, $filter['options']));
+            }
+        }
+        $formBuilder->add('Filter', FilterButtonType::class, ['translation_domain' => $this->translationDomain, 'attr' => ['row_class' => 'col-12 col-md-2 mb-2 mb-md-0']]);
+
+        return $formBuilder->getForm();
+    }
+
 
 }

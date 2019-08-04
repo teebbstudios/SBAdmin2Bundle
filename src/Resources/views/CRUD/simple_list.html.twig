@@ -1,1 +1,15 @@
 {#The simple list template. Only show list, no filter, no pager, no actions.#}
+{% block teebb_head_title %}
+    {{ admin.label ~ ' ' ~ action ~ '|' ~ 'TeebbSBAdmin2'  |trans({}, teebb_sbadmin2.transDomain) }}
+{% endblock %}
+
+{% block heading_label %}
+    {{ admin.label ~ ' ' ~ action |trans({}, teebb_sbadmin2.transDomain) }}
+{% endblock %}
+
+{% block heading_link %}
+    <a href="{{ path(admin.routes.getRouteName('create')) }}" class="btn btn-sm btn-primary shadow-sm">
+        <i class="fas fa-plus-circle fa-sm text-white-50 pr-2"></i>
+        {{ 'Add'|trans({}, teebb_sbadmin2.transDomain) ~' '~admin.label|trans({}, teebb_sbadmin2.transDomain) }}
+    </a>
+{% endblock %}

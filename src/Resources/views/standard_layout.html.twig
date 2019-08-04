@@ -1,8 +1,6 @@
-
 {% set _content = block('content') is defined ? block('content')|trim : null %}
 {% set _heading_label = block('heading_label') is defined ? block('heading_label')|trim : null %}
 {% set _heading_link = block('heading_link') is defined ? block('heading_link')|trim : null %}
-
 
 <!DOCTYPE html>
 <html lang="zh">
@@ -20,8 +18,6 @@
     <title>
         {% block teebb_head_title %}
             {{ 'TeebbSBAdmin2'|trans({}, teebb_sbadmin2.transDomain) }}
-
-
         {% endblock %}
     </title>
 
@@ -331,7 +327,7 @@
                 <!-- FULL WIDTH Content -->
                 <div class="full-width-wrapper">
                     {% block notice %}
-                        {#{% include '@SonataCore/FlashMessage/render.html.twig' %}#}
+{#                        {% include '@SonataCore/FlashMessage/render.html.twig' %}#}
                     {% endblock notice %}
 
                     {% if _content is not empty %}

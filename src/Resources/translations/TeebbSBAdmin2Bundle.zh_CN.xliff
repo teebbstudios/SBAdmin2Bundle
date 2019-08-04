@@ -22,7 +22,38 @@
                 <source>Back to Dashboard</source>
                 <target>返回控制台首页</target>
             </trans-unit>
-
+            <trans-unit id="Filter">
+                <source>Filter</source>
+                <target>过滤</target>
+            </trans-unit>
+            <trans-unit id="List">
+                <source>List</source>
+                <target>列表</target>
+            </trans-unit>
+            <trans-unit id="Add">
+                <source>Add</source>
+                <target>添加</target>
+            </trans-unit>
+            <trans-unit id="label_previous">
+                <source>label_previous</source>
+                <target>上一页</target>
+            </trans-unit>
+            <trans-unit id="label_next">
+                <source>label_next</source>
+                <target>下一页</target>
+            </trans-unit>
+            <trans-unit id="Check All">
+                <source>Check All</source>
+                <target>选择所有行</target>
+            </trans-unit>
+            <trans-unit id="Options">
+                <source>Options</source>
+                <target>操作</target>
+            </trans-unit>
+            <trans-unit id="Woooooo! It's Nothing! Empty! Blank!">
+                <source>Woooooo! It's Nothing! Empty! Blank!</source>
+                <target>这里还是空空如也！</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

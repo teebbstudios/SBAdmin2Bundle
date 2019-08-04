@@ -160,6 +160,11 @@ class RouteCollection
         throw new \InvalidArgumentException(sprintf('Element "%s" does not exist.', $name));
     }
 
+    public function getRouteName($name)
+    {
+        return $this->get($name)->getDefault('_teebb_name');
+    }
+
     /**
      * @param string $name
      *

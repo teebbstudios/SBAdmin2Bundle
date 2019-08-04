@@ -52,12 +52,11 @@ class RoleSecurityHandler implements SecurityHandlerInterface
             $attributes = [$attributes];
         }
 
-        foreach ($attributes as $pos => $attribute) {
-            $attributes[$pos] = sprintf($this->getBaseRole($admin), $attribute);
-        }
+//        foreach ($attributes as $pos => $attribute) {
+//            $attributes[$pos] = sprintf($this->getBaseRole($admin), $attribute);
+//        }
 
         $allRole = sprintf($this->getBaseRole($admin), 'ALL');
-
         try {
             return $this->authorizationChecker->isGranted($this->superAdminRoles)
                 || $this->authorizationChecker->isGranted($attributes, $object)

@@ -1,1 +1,123 @@
 {#The full list. Show filter, actions, pager and so on.#}
+
+{% extends '@TeebbSBAdmin2/CRUD/base_list.html.twig' %}
+
+{% block teebb_head_title %}
+    {{ admin.label ~ ' ' ~ action ~ '|' ~ 'TeebbSBAdmin2'  |trans({}, teebb_sbadmin2.transDomain) }}
+{% endblock %}
+
+{% block heading_label %}
+    {{ admin.label ~ ' ' ~ action |trans({}, teebb_sbadmin2.transDomain) }}
+{% endblock %}
+
+{% block heading_link %}
+    <a href="{{ path(admin.routes.getRouteName('create')) }}" class="btn btn-sm btn-primary shadow-sm">
+        <i class="fas fa-plus-circle fa-sm text-white-50 pr-2"></i>
+        {{ 'Add'|trans({}, teebb_sbadmin2.transDomain) ~' '~admin.label|trans({}, teebb_sbadmin2.transDomain) }}
+    </a>
+{% endblock %}
+
+{% block content %}
+
+    <!--List Filter-->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="list-filter">
+                {% include '@TeebbSBAdmin2/Form/list_filter_form.html.twig' with filterForm %}
+            </div>
+        </div>
+    </div>
+
+    <!--List Contents-->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">{{ admin.label ~ ' ' ~ action |trans({}, teebb_sbadmin2.transDomain) }}</h6>
+            <div class="dropdown no-arrow">
+                <a class="dropdown-toggle" href="{{ path(admin.routes.getRouteName('create')) }}" role="button" id="dropdownNewContentsMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-500"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownNewContentsMenuLink">
+                    <a class="dropdown-item" href="#"><i class="fa fa-plus-circle text-gray-500 pr-2"></i>{{ 'Add'|trans({}, teebb_sbadmin2.transDomain) ~' '~admin.label|trans({}, teebb_sbadmin2.transDomain) }}</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+
+            <div class="content-list mt-3">
+                <form action="#" method="post">
+                    <!--内容批量操作-->
+                    <div class="content-bat-option form-row">
+                        <div class="col-6 col-sm-3 pr-2 mb-3">
+                            <label for="select_bat_option_top" class="sr-only">批量操作</label>
+                            <select id="select_bat_option_top" class="form-control form-control-sm" name="">
+                                <option selected="">批量操作</option>
+                                <option>删除内容</option>
+                                <option value="1">取消发布内容</option>
+                                <option value="2">发布内容</option>
+                            </select>
+                        </div>
+                        <div class="col-6 col-sm-3 pr-2 mb-3">
+                            <button class="btn btn-secondary btn-icon-split btn-sm">
+                                                <span class="icon text-white-50">
+                                                  <i class="fas fa-check"></i>
+                                                </span>
+                                <span class="text">应用</span>
+                            </button>
+                        </div>
+
+                        <div class="col-12 col-sm-6 form-inline mb-3 justify-content-sm-end">
+                            <label for="select_page_limit_top">共123个 每页显示</label>
+                            <select id="select_page_limit_top" class="form-control form-control-sm select-page-limit" name="">
+                                <option selected="">15</option>
+                                <option value="1">25</option>
+                                <option value="2">50</option>
+                                <option value="2">100</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!--List Contents Table-->
+                    <div class="table-responsive">
+                        {% include teebb_sbadmin2.sbadmin2Config.getTemplate('full_list_table') with {'pagination': pagination, 'list_item_actions': list_item_actions, 'list_item_properties': list_item_properties} %}
+                    </div>
+
+                    <!--内容批量操作-->
+                    <div class="content-bat-option form-row">
+                        <div class="col-6 col-sm-3 pr-2 mb-3">
+                            <label for="select_bat_option_bottom" class="sr-only">批量操作</label>
+                            <select id="select_bat_option_bottom" class="form-control form-control-sm" name="">
+                                <option selected="">批量操作</option>
+                                <option>删除内容</option>
+                                <option value="1">取消发布内容</option>
+                                <option value="2">发布内容</option>
+                            </select>
+                        </div>
+                        <div class="col-6 col-sm-3 pr-2 mb-3">
+                            <button class="btn btn-secondary btn-icon-split btn-sm">
+                                                <span class="icon text-white-50">
+                                                  <i class="fas fa-check"></i>
+                                                </span>
+                                <span class="text">应用</span>
+                            </button>
+                        </div>
+
+                        <div class="col-12 col-sm-6 form-inline mb-3 justify-content-sm-end">
+                            <label for="select_page_limit_bottom">共123个 每页显示</label>
+                            <select id="select_page_limit_bottom" class="form-control form-control-sm select-page-limit" name="">
+                                <option selected="">15</option>
+                                <option value="1">25</option>
+                                <option value="2">50</option>
+                                <option value="2">100</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {{ knp_pagination_render(pagination,teebb_sbadmin2.sbadmin2Config.getTemplate('bootstrap4_pager'),{},{align: 'right', size: 'small'}) }}
+
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

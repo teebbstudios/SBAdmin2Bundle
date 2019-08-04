@@ -22,12 +22,13 @@ class TeebbSBAdmin2Extension extends Extension
 
         $resources = [
             'command',
+            'controller',
             'core',
-            'twig',
+            'form',
             'menu',
             'route',
             'security',
-            'controller',
+            'twig',
         ];
 
         foreach ($resources as $resource) {

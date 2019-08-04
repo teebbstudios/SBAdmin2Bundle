@@ -2,8 +2,13 @@
 
 namespace Teebb\SBAdmin2Bundle\Admin;
 
+use Doctrine\Common\Persistence\ObjectManager;
 use Knp\Menu\FactoryInterface;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormRegistryInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Teebb\SBAdmin2Bundle\Route\RouteBuilderInterface;
 use Teebb\SBAdmin2Bundle\Route\RouteCollection;
@@ -152,5 +157,47 @@ interface AdminInterface extends ParentAdminInterface
 
     public function setLabelTranslatorStrategy($labelTranslatorStrategy): void;
 
+    public function getObjectManager(): ObjectManager;
+
+    public function setObjectManager(ObjectManager $objectManager): void;
+
+    public function getFormFactory(): FormFactoryInterface;
+
+    public function setFormFactory(FormFactoryInterface $formFactory): void;
+
+    public function getFormRegistry(): FormRegistryInterface;
+
+    public function setFormRegistry(FormRegistryInterface $formRegistry): void;
+
+    public function getPropertyAccessor(): PropertyAccessorInterface;
+
+    public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor): void;
+
     public function checkAccess($action, $object = null);
+
+    /**
+     * Get the filter properties which in the entity class;
+     * @return array
+     */
+    public function getAccessFilterProperties(): array;
+
+    /**
+     * Get the entity properties for list table
+     * @return array
+     */
+    public function getListProperties(): array;
+
+    /**
+     * Get the list table item actions
+     * @return array
+     */
+    public function getListItemActions(): array;
+
+    /*Get all results*/
+    public function getResults();
+
+    public function getConditionalQueryResults(array $condition, array $orders = null);
+
+    public function getListFilterForm(): FormInterface;
+
 }

@@ -67,6 +67,18 @@ class AdminServicesCompilePass implements CompilerPassInterface
             $restSettings['rest'] = $adminConfig['rest'];
             $definition->addMethodCall('setRest', [$restSettings]);
 
+            //Set ObjectManager
+            $definition->addMethodCall('setObjectManager',[new Reference('doctrine.orm.entity_manager')]);
+
+            //Set FormBuilder
+            $definition->addMethodCall('setFormFactory', [new Reference('form.factory')]);
+
+            //Set FormRegistry
+            $definition->addMethodCall('setFormRegistry', [new Reference('form.registry')]);
+
+            //Set PropertyAccessor
+            $definition->addMethodCall('setPropertyAccessor', [new Reference('property_accessor')]);
+
             //If children Admin exits, add children Admin and set parent Admin.
             if (array_key_exists('children', $adminConfig) && array_key_exists('map_property', $adminConfig)) {
                 $definition->addMethodCall('addChild', [new Reference($adminConfig['children']), $adminConfig['map_property']]);
