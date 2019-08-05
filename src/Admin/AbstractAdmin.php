@@ -5,17 +5,17 @@ namespace Teebb\SBAdmin2Bundle\Admin;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Menu\FactoryInterface;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Form;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormRegistryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Routing\Exception\RouteNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Teebb\SBAdmin2Bundle\Exception\FilterPropertyNotFoundException;
+use Teebb\SBAdmin2Bundle\Exception\PropertyNotExistException;
 use Teebb\SBAdmin2Bundle\Form\Type\FilterButtonType;
 use Teebb\SBAdmin2Bundle\Route\RouteBuilderInterface;
 use Teebb\SBAdmin2Bundle\Route\RouteCollection;
@@ -146,6 +146,12 @@ class AbstractAdmin implements AdminInterface
      * @var array
      */
     protected $crudConfigs;
+
+    /**
+     * The admin default form fields. Merge with create edit fields.
+     * @var array
+     */
+    protected $formConfigs;
 
     /**
      * The admin rest settings
@@ -644,7 +650,6 @@ class AbstractAdmin implements AdminInterface
         }
 
         foreach ($this->crudConfigs[$action]['permission']['roles'] as $role) {
-            dd($role);
 
             if (false === $this->isGranted($role, $object)) {
                 return false;
@@ -827,21 +832,30 @@ class AbstractAdmin implements AdminInterface
             ->from($this->entity, 'o');
 
         $metaData = $this->objectManager->getMetadataFactory()->getMetadataFor($this->entity);
+        $associationNames = $metaData->getAssociationNames();
 
         foreach ($condition as $filterName => $filterValue) {
-            switch ($metaData->getTypeOfField($filterName)) {
-                case 'string':
-                    if (!empty($filterValue)) {
-                        $where = $qb->expr()->like('o.' . $filterName, ':' . $filterName);
-                        $queryBuilder->andWhere($where)->setParameter($filterName, '%' . $filterValue . '%');
-                    }
-                    break;
-                case 'integer':
-                    if (!empty($filterValue)) {
-                        $where = $qb->expr()->eq('o.' . $filterName, ':' . $filterName);
-                        $queryBuilder->andWhere($where)->setParameter($filterName, $filterValue);
-                    }
-                    break;
+            /*If the property is association*/
+            if (in_array($filterName, $associationNames)) {
+                if (!empty($filterValue)) {
+                    $where = $qb->expr()->eq('o.' . $filterName, ':' . $filterName);
+                    $queryBuilder->andWhere($where)->setParameter($filterName, $filterValue);
+                }
+            } else {
+                switch ($metaData->getTypeOfField($filterName)) {
+                    case 'integer':
+                        if (!empty($filterValue)) {
+                            $where = $qb->expr()->eq('o.' . $filterName, ':' . $filterName);
+                            $queryBuilder->andWhere($where)->setParameter($filterName, $filterValue);
+                        }
+                        break;
+                    default:
+                        if (!empty($filterValue)) {
+                            $where = $qb->expr()->like('o.' . $filterName, ':' . $filterName);
+                            $queryBuilder->andWhere($where)->setParameter($filterName, '%' . $filterValue . '%');
+                        }
+                        break;
+                }
             }
         }
 
@@ -857,6 +871,7 @@ class AbstractAdmin implements AdminInterface
                 array_push($filterProperties, $filter);
             }
         }
+
         return $filterProperties;
     }
 
@@ -865,8 +880,19 @@ class AbstractAdmin implements AdminInterface
         $fields = $this->crudConfigs['list']['fields'];
         $fieldsArray = [];
         foreach ($fields as $field) {
-            if (property_exists(new $this->entity, $field['property'])) {
-                array_push($fieldsArray, $field);
+            if (strpos($field['property'], '.') !== false) {
+                $propertyArray = explode('.', $field['property']);
+                if (property_exists(new $this->entity, $propertyArray[0])) {
+                    array_push($fieldsArray, $field);
+                } else {
+                    throw new PropertyNotExistException(sprintf('The property %s is not exist in %s.Check the admin yaml file.', $propertyArray[0], $this->entity));
+                }
+            } else {
+                if (property_exists(new $this->entity, $field['property'])) {
+                    array_push($fieldsArray, $field);
+                } else {
+                    throw new PropertyNotExistException(sprintf('The property %s is not exist in %s.Check the admin yaml file.', $field['property'], $this->entity));
+                }
             }
         }
         return $fieldsArray;
@@ -890,7 +916,11 @@ class AbstractAdmin implements AdminInterface
         return $actionsArray;
     }
 
-    public function getListFilterForm(): FormInterface
+    /**
+     * @return FormInterface|null
+     * @throws PropertyNotExistException
+     */
+    public function getListFilterForm()
     {
         if (empty($filters = $this->crudConfigs['list']['filters'])) {
             return null;
@@ -904,7 +934,7 @@ class AbstractAdmin implements AdminInterface
         foreach ($filters as $filter) {
             if (empty($filter['roles']) || $this->isGranted($filter['roles'])) {
                 if (!property_exists(new $this->entity, $filter['property'])) {
-                    throw new FilterPropertyNotFoundException(sprintf('The filter property %s not found in class %s. Please check the admin config files.', $filter['property'], $this->entity));
+                    throw new PropertyNotExistException(sprintf('The property %s is not exist in %s.Check the admin yaml file.', $filter['property'], $this->entity));
                 }
                 $type = $typeGuesser->guessType($this->entity, $filter['property'])->getType();
 
@@ -928,5 +958,53 @@ class AbstractAdmin implements AdminInterface
         return $formBuilder->getForm();
     }
 
+    public function getEntityObject($id)
+    {
+        return $this->objectManager->find($this->entity, $id);
+    }
 
+    /**
+     * @return array
+     */
+    public function getFormConfigs(): array
+    {
+        return $this->formConfigs;
+    }
+
+    /**
+     * @param array $formConfigs
+     */
+    public function setFormConfigs(array $formConfigs): void
+    {
+        $this->formConfigs = $formConfigs;
+    }
+
+    public function getForm(string $action): FormInterface
+    {
+        $formBuilder = $this->formFactory->createNamedBuilder($action, FormType::class, null, ['data_class' => $this->entity]);
+
+        $formFields = array_merge_recursive($this->formConfigs['fields'], $this->crudConfigs[$action]['fields']);
+
+        $fieldsArray = [];
+        foreach ($formFields as $formField) {
+            if (property_exists(new $this->entity, $formField['property'])) {
+                array_push($fieldsArray, $formField);
+            } else {
+                throw new PropertyNotExistException(sprintf('The property %s is not exist in %s.Check the admin yaml file.', $formField['property'], $this->entity));
+            }
+        }
+
+        $options = array('translation_domain' => $this->translationDomain);
+        $typeGuesser = $this->formRegistry->getTypeGuesser();
+
+        foreach ($fieldsArray as $field) {
+            $type = $typeGuesser->guessType($this->entity, $field['property'])->getType();
+
+            $formBuilder->add($field['property'], $field['type'] ?? $type, array_merge_recursive($options, $field['options']));
+        }
+
+        $formBuilder->add('Submit', SubmitType::class, ['translation_domain' => $this->translationDomain]);
+
+        return $formBuilder->getForm();
+    }
 }

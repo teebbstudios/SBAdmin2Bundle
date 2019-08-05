@@ -5,6 +5,8 @@ namespace Teebb\SBAdmin2Bundle\Controller;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyPath;
 use Teebb\SBAdmin2Bundle\Admin\AdminInterface;
 use Teebb\SBAdmin2Bundle\Templating\TemplateRegistryInterface;
 
@@ -80,20 +82,17 @@ class CRUDController extends AbstractFOSRestController
         $listItemProperties = $this->admin->getListProperties();
         $filterProperties = $this->admin->getAccessFilterProperties();
 
-        $filterParameters = $request->get('filter');
+        $filterParameters = $request->get('filter') ?? [];
 
         $pagination = $this->paginator->paginate(
-            empty($filterParameters) ? $this->admin->getResults() : $this->admin->getConditionalQueryResults($filterParameters),
+            $this->admin->getConditionalQueryResults($filterParameters),
             $request->query->getInt('page', 1)/*page number*/,
             $request->query->getInt('limit', 10)/*page number*/
         );
 
         $filterForm = $this->admin->getListFilterForm();
 
-        $templateName = $filterForm == null ? 'simple_list' : 'full_list';
-
-        if ($filterForm !== null)
-        {
+        if ($filterForm !== null) {
             $filterForm->handleRequest($request);
             if ($filterForm->isSubmitted() && $filterForm->isValid()) {
 
@@ -108,7 +107,7 @@ class CRUDController extends AbstractFOSRestController
             }
         }
 
-        return $this->render($this->templateRegistry->getTemplate($templateName), [
+        return $this->render($this->templateRegistry->getTemplate('full_list'), [
                 'filterProperties' => $filterProperties,
                 'filterForm' => $filterForm == null ? null : $filterForm->createView(),
                 'pagination' => $pagination,
@@ -120,4 +119,95 @@ class CRUDController extends AbstractFOSRestController
         );
     }
 
+    public function editAction(Request $request)
+    {
+        $id = $request->get($this->admin->getIdParameter());
+
+        $object = $this->admin->getEntityObject($id);
+
+        if (!$object) {
+            throw $this->createNotFoundException(sprintf('unable to find the object with id: %s', $id));
+        }
+
+        $this->admin->checkAccess('edit', $object);
+
+        $editForm = $this->admin->getForm('edit');
+
+        $editForm->setData($object);
+
+        $editForm->handleRequest($request);
+
+        if ($editForm->isSubmitted() && $editForm->isValid()) {
+
+            $objectData = $editForm->getData();
+
+            $em = $this->admin->getObjectManager();
+
+            $em->persist($objectData);
+            $em->flush();
+
+            $this->addFlash('success', sprintf('Successfully saved!'));
+        }
+
+        return $this->render($this->templateRegistry->getTemplate('edit_form'), [
+                'object' => $object,
+                'action' => 'Edit',
+                'admin' => $this->admin,
+                'editForm' => $editForm->createView(),
+            ]
+        );
+    }
+
+    public function createAction(Request $request)
+    {
+
+        $this->admin->checkAccess('create');
+
+        $createForm = $this->admin->getForm('create');
+
+        $createForm->handleRequest($request);
+
+        if ($createForm->isSubmitted() && $createForm->isValid()) {
+
+            $objectData = $createForm->getData();
+
+            $em = $this->admin->getObjectManager();
+
+            $em->persist($objectData);
+            $em->flush();
+
+            $this->addFlash('success', sprintf('Successfully created!'));
+
+        }
+
+        return $this->render($this->templateRegistry->getTemplate('create_form'), [
+                'action' => 'Create',
+                'admin' => $this->admin,
+                'createForm' => $createForm->createView(),
+            ]
+        );
+    }
+
+    public function deleteAction(Request $request)
+    {
+        $id = $request->get($this->admin->getIdParameter());
+
+        $object = $this->admin->getEntityObject($id);
+
+        if (!$object) {
+            throw $this->createNotFoundException(sprintf('unable to find the object with id: %s', $id));
+        }
+
+        $this->admin->checkAccess('delete', $object);
+
+        $em = $this->admin->getObjectManager();
+
+        $em->remove($object);
+
+        $em->flush();
+
+        $this->addFlash('success', sprintf('Successfully delete!'));
+
+        return $this->redirectToRoute($this->admin->getRoutes()->getRouteName('list'));
+    }
 }

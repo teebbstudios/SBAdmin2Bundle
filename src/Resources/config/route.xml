@@ -10,7 +10,7 @@
             <argument type="service" id="teebb.sbadmin2.route.routes_cache"/>
         </service>
         <service id="teebb.sbadmin2.route.routes_cache" class="Teebb\SBAdmin2Bundle\Route\RoutesCache" public="true">
-            <argument>%kernel.cache_dir%/sonata/admin</argument>
+            <argument>%kernel.cache_dir%/teebb/admin</argument>
             <argument>%kernel.debug%</argument>
         </service>
         <service id="sonata.admin.route.cache_warmup" class="Teebb\SBAdmin2Bundle\Route\RoutesCacheWarmUp" public="true">

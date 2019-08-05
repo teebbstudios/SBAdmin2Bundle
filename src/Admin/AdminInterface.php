@@ -10,6 +10,7 @@ use Symfony\Component\Form\FormRegistryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Teebb\SBAdmin2Bundle\Exception\PropertyNotExistException;
 use Teebb\SBAdmin2Bundle\Route\RouteBuilderInterface;
 use Teebb\SBAdmin2Bundle\Route\RouteCollection;
 use Teebb\SBAdmin2Bundle\Route\RouteGeneratorInterface;
@@ -198,6 +199,22 @@ interface AdminInterface extends ParentAdminInterface
 
     public function getConditionalQueryResults(array $condition, array $orders = null);
 
-    public function getListFilterForm(): FormInterface;
+    /**
+     * @return FormInterface|null
+     * @throws PropertyNotExistException
+     */
+    public function getListFilterForm();
 
+    /**
+     * Get current entity object
+     * @param $id
+     * @return mixed
+     */
+    public function getEntityObject($id);
+
+    public function getFormConfigs(): array;
+
+    public function setFormConfigs(array $formConfigs): void;
+
+    public function getForm(string $action): FormInterface;
 }

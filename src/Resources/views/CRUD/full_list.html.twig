@@ -3,7 +3,7 @@
 {% extends '@TeebbSBAdmin2/CRUD/base_list.html.twig' %}
 
 {% block teebb_head_title %}
-    {{ admin.label ~ ' ' ~ action ~ '|' ~ 'TeebbSBAdmin2'  |trans({}, teebb_sbadmin2.transDomain) }}
+    {{ admin.label ~ ' ' ~ action ~ ' | ' ~ 'TeebbSBAdmin2'  |trans({}, teebb_sbadmin2.transDomain) }}
 {% endblock %}
 
 {% block heading_label %}
@@ -19,6 +19,7 @@
 
 {% block content %}
 
+    {% if filterForm is not empty %}
     <!--List Filter-->
     <div class="card shadow mb-4">
         <div class="card-body">
@@ -27,6 +28,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
     <!--List Contents-->
     <div class="card shadow mb-4">
@@ -44,13 +46,13 @@
         <div class="card-body">
 
             <div class="content-list mt-3">
-                <form action="#" method="post">
+                <form method="get">
                     <!--内容批量操作-->
                     <div class="content-bat-option form-row">
                         <div class="col-6 col-sm-3 pr-2 mb-3">
                             <label for="select_bat_option_top" class="sr-only">批量操作</label>
-                            <select id="select_bat_option_top" class="form-control form-control-sm" name="">
-                                <option selected="">批量操作</option>
+                            <select id="select_bat_option_top" class="form-control form-control-sm" name="batch-actions">
+                                <option selected value="">批量操作</option>
                                 <option>删除内容</option>
                                 <option value="1">取消发布内容</option>
                                 <option value="2">发布内容</option>
@@ -58,20 +60,18 @@
                         </div>
                         <div class="col-6 col-sm-3 pr-2 mb-3">
                             <button class="btn btn-secondary btn-icon-split btn-sm">
-                                                <span class="icon text-white-50">
-                                                  <i class="fas fa-check"></i>
-                                                </span>
+                                <span class="icon text-white-50"><i class="fas fa-check"></i></span>
                                 <span class="text">应用</span>
                             </button>
                         </div>
 
                         <div class="col-12 col-sm-6 form-inline mb-3 justify-content-sm-end">
-                            <label for="select_page_limit_top">共123个 每页显示</label>
-                            <select id="select_page_limit_top" class="form-control form-control-sm select-page-limit" name="">
-                                <option selected="">15</option>
-                                <option value="1">25</option>
-                                <option value="2">50</option>
-                                <option value="2">100</option>
+                            <label for="select_page_limit_top">共{{ pagination.getTotalItemCount }}个 每页显示</label>
+                            <select id="select_page_limit_top" class="form-control form-control-sm select-page-limit" name="limit">
+                                <option selected value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
                             </select>
                         </div>
                     </div>
@@ -81,38 +81,7 @@
                         {% include teebb_sbadmin2.sbadmin2Config.getTemplate('full_list_table') with {'pagination': pagination, 'list_item_actions': list_item_actions, 'list_item_properties': list_item_properties} %}
                     </div>
 
-                    <!--内容批量操作-->
-                    <div class="content-bat-option form-row">
-                        <div class="col-6 col-sm-3 pr-2 mb-3">
-                            <label for="select_bat_option_bottom" class="sr-only">批量操作</label>
-                            <select id="select_bat_option_bottom" class="form-control form-control-sm" name="">
-                                <option selected="">批量操作</option>
-                                <option>删除内容</option>
-                                <option value="1">取消发布内容</option>
-                                <option value="2">发布内容</option>
-                            </select>
-                        </div>
-                        <div class="col-6 col-sm-3 pr-2 mb-3">
-                            <button class="btn btn-secondary btn-icon-split btn-sm">
-                                                <span class="icon text-white-50">
-                                                  <i class="fas fa-check"></i>
-                                                </span>
-                                <span class="text">应用</span>
-                            </button>
-                        </div>
-
-                        <div class="col-12 col-sm-6 form-inline mb-3 justify-content-sm-end">
-                            <label for="select_page_limit_bottom">共123个 每页显示</label>
-                            <select id="select_page_limit_bottom" class="form-control form-control-sm select-page-limit" name="">
-                                <option selected="">15</option>
-                                <option value="1">25</option>
-                                <option value="2">50</option>
-                                <option value="2">100</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    {{ knp_pagination_render(pagination,teebb_sbadmin2.sbadmin2Config.getTemplate('bootstrap4_pager'),{},{align: 'right', size: 'small'}) }}
+                    {{ knp_pagination_render(pagination,teebb_sbadmin2.sbadmin2Config.getTemplate('bootstrap4_pager'),{},{align: 'right'}) }}
 
                 </form>
 

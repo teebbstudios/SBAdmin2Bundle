@@ -68,29 +68,28 @@ class MenuBuilder
             $groups[] = $groupName;
             foreach ($group as $itemsKey => $itemsInfo) {
 
+                $menuItem = null;
                 if (1 === count($itemsInfo['items'])) {
                     if ($this->canGenerateMenuItem($itemsInfo['items'][0], $itemsInfo)) {
-                        $menuItem = $menu->addChild($this->generateMenuItem($itemsInfo['items'][0], $itemsInfo));
-                        $menuItem->setExtra('group', $groupName);
-                        $menuItem->setExtra('icon', $itemsInfo['icon'] ?? $this->sbadmin2Config->getOption('default_icon'));
-                        $menuItem->setExtra('translation_domain', $itemsInfo['label_catalogue'] ?? $this->sbadmin2Config->getOption('default_label_catalogue'));
-                        $menuItem->setExtra('roles', $itemsInfo['roles']);
 
+                        $menuItem = $menu->addChild($this->generateMenuItem($itemsInfo['items'][0], $itemsInfo));
                     }
+
                 } else {
                     $menuItem = $menu->addChild($this->factory->createItem($itemsInfo['label']));
 
                     foreach ($itemsInfo['items'] as $item) {
+
                         if ($this->canGenerateMenuItem($item, $itemsInfo)) {
                             $menuItem->addChild($this->generateMenuItem($item, $itemsInfo));
                         }
                     }
-                    $menuItem->setExtra('group', $groupName);
-                    $menuItem->setExtra('icon', $itemsInfo['icon'] ?? $this->sbadmin2Config->getOption('default_icon'));
-                    $menuItem->setExtra('translation_domain', $itemsInfo['label_catalogue'] ?? $this->sbadmin2Config->getOption('default_label_catalogue'));
-                    $menuItem->setExtra('roles', $itemsInfo['roles']);
-
                 }
+
+                $menuItem->setExtra('group', $groupName);
+                $menuItem->setExtra('icon', $itemsInfo['icon'] ?? $this->sbadmin2Config->getOption('default_icon'));
+                $menuItem->setExtra('translation_domain', $itemsInfo['label_catalogue'] ?? $this->sbadmin2Config->getOption('default_label_catalogue'));
+                $menuItem->setExtra('roles', $itemsInfo['roles']);
 
 
                 if (isset($itemsInfo['provider'])) {
@@ -132,6 +131,7 @@ class MenuBuilder
     {
 
         if (isset($item['admin']) && !empty($item['admin']) && !isset($group['provider'])) {
+
             /** @var AbstractAdmin $admin */
             $admin = $this->sbadmin2Config->getInstance($item['admin']);
 

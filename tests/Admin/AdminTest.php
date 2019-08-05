@@ -19,6 +19,7 @@ class AdminTest extends KernelTestCase
     public function testAdmins()
     {
         $articleAdmin = self::$container->get('App\Admin\ArticleAdmin');
+        var_dump($articleAdmin->getRoutes()->getElements());
 
         $articleAdmin->initialize();
 

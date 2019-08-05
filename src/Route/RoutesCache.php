@@ -52,6 +52,7 @@ class RoutesCache
         $filename = $this->cacheFolder.'/route_'.md5($admin->getAdminServiceId());
 
         $cache = new ConfigCache($filename, $this->debug);
+
         if (!$cache->isFresh()) {
             $resources = [];
             $routes = [];
@@ -66,6 +67,7 @@ class RoutesCache
             }
 
             foreach ($admin->getRoutes()->getElements() as $code => $route) {
+                var_dump($code);
                 $routes[$code] = $route->getDefault('_teebb_name');
             }
 

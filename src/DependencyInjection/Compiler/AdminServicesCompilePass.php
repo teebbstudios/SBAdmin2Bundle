@@ -63,6 +63,9 @@ class AdminServicesCompilePass implements CompilerPassInterface
             $crudSettings['list'] = $adminConfig['list'];
             $definition->addMethodCall('setCrudConfigs', [$crudSettings]);
 
+            //Set default form fields.
+            $definition->addMethodCall('setFormConfigs', [$adminConfig['form'] ?? []]);
+
             //Set Rest configs;
             $restSettings['rest'] = $adminConfig['rest'];
             $definition->addMethodCall('setRest', [$restSettings]);

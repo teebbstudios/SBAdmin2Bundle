@@ -6,11 +6,11 @@
             </th>
             {% for property in list_item_properties %}
                 <th scope="col" class="{{ property.class }}">
-                    {% if property.sortable == true %}
-                        {{ knp_pagination_sortable(pagination, property.label|trans({}, teebb_sbadmin2.transDomain), property.property) }}
+                    {%- if property.sortable == true %}
+                        {{ knp_pagination_sortable(pagination, property.label|trans({}, teebb_sbadmin2.transDomain), 'o.'~property.property) }}
                     {% else %}
                         {{ property.label|trans({}, teebb_sbadmin2.transDomain) }}
-                    {% endif %}
+                    {% endif -%}
                 </th>
             {% endfor %}
             <th scope="col">{{ 'Options'|trans({}, teebb_sbadmin2.transDomain) }}</th>
@@ -23,7 +23,13 @@
                     <input type="checkbox" class="form-check" value="{{ item.id }}">
                 </td>
                 {% for property in list_item_properties %}
-                    <td>{{ admin.propertyAccessor.getValue(item, property.property) }}</td>
+                    <td class="{{ property.class }}">
+                        {%- if property['action'] is defined %}
+                            <a href="{{ path(admin.routes.getRouteName(property['action']), {'id': item.id }) }}">{{ admin.propertyAccessor.getValue(item, property.property) }}</a>
+                        {% else %}
+                            {{ admin.propertyAccessor.getValue(item, property.property) }}
+                        {% endif -%}
+                    </td>
                 {% endfor %}
                 <td class="text-nowrap">
                     {% for action in list_item_actions %}

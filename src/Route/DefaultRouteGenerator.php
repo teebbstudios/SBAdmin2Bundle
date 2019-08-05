@@ -70,6 +70,7 @@ class DefaultRouteGenerator implements RouteGeneratorInterface
         array $parameters = [],
         $absolute = UrlGeneratorInterface::ABSOLUTE_PATH
     ) {
+
         // if the admin is a child we automatically append the parent's id
         if ($admin->isChild() && $admin->hasRequest()) {
             // twig template does not accept variable hash key ... so cannot use admin.idparameter ...

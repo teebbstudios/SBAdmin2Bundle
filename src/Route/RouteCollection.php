@@ -81,7 +81,8 @@ class RouteCollection
         $condition = ''
     ) {
         $pattern = $this->baseRoutePattern.'/'.($pattern ?: $name);
-        $code = $name;
+        $code = $this->getCode($name);
+
         $routeName = $this->baseRouteName.'_'.$name;
 
         if (!isset($defaults['_controller'])) {
@@ -99,7 +100,7 @@ class RouteCollection
 
         $defaults['_teebb_name'] = $routeName;
 
-        $this->elements[$name] = function () use (
+        $this->elements[$this->getCode($name)] = function () use (
             $pattern, $defaults, $requirements, $options, $host, $schemes, $methods, $condition) {
             return new Route($pattern, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
         };
@@ -162,7 +163,8 @@ class RouteCollection
 
     public function getRouteName($name)
     {
-        return $this->get($name)->getDefault('_teebb_name');
+
+        return $this->get($this->getCode($name))->getDefault('_teebb_name');
     }
 
     /**
@@ -175,6 +177,20 @@ class RouteCollection
         unset($this->elements[$name]);
 
         return $this;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    public function getCode($name)
+    {
+        if (false !== strrpos($name, '.')) {
+            return $name;
+        }
+
+        return $this->baseCodeRoute.'.'.$name;
     }
 
     /**
