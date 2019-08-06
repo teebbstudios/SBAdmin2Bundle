@@ -3,17 +3,17 @@
 namespace Teebb\SBAdmin2Bundle\Admin;
 
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Menu\FactoryInterface;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormRegistryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface as RoutingUrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Teebb\SBAdmin2Bundle\Exception\PropertyNotExistException;
 use Teebb\SBAdmin2Bundle\Form\Type\FilterButtonType;
@@ -203,6 +203,17 @@ class AbstractAdmin implements AdminInterface
      * @var PropertyAccessorInterface
      */
     protected $propertyAccessor;
+
+    /**
+     * @var array
+     */
+    protected $batchActions;
+
+    /**
+     * The list table action buttons type. item or group
+     * @var string
+     */
+    protected $listActionType;
 
     public function __construct($adminServiceId, $entity, $baseControllerName)
     {
@@ -603,6 +614,23 @@ class AbstractAdmin implements AdminInterface
     /**
      * @return array
      */
+    public function getBatchActions(): array
+    {
+        return $this->batchActions;
+    }
+
+    /**
+     * @param array $batchActions
+     */
+    public function setBatchActions(array $batchActions): void
+    {
+        $this->batchActions = $batchActions;
+    }
+
+
+    /**
+     * @return array
+     */
     public function getRest(): array
     {
         return $this->rest;
@@ -858,6 +886,12 @@ class AbstractAdmin implements AdminInterface
                 }
             }
         }
+        if ($orders !== null)
+        {
+            foreach ($orders as $orderSort => $order) {
+                $queryBuilder->addOrderBy('o.' . $orderSort, $order);
+            }
+        }
 
         return $queryBuilder->getQuery();
     }
@@ -979,6 +1013,22 @@ class AbstractAdmin implements AdminInterface
         $this->formConfigs = $formConfigs;
     }
 
+    /**
+     * @return string
+     */
+    public function getListActionType(): string
+    {
+        return $this->listActionType;
+    }
+
+    /**
+     * @param string $listActionType
+     */
+    public function setListActionType(string $listActionType): void
+    {
+        $this->listActionType = $listActionType;
+    }
+
     public function getForm(string $action): FormInterface
     {
         $formBuilder = $this->formFactory->createNamedBuilder($action, FormType::class, null, ['data_class' => $this->entity]);
@@ -1003,8 +1053,45 @@ class AbstractAdmin implements AdminInterface
             $formBuilder->add($field['property'], $field['type'] ?? $type, array_merge_recursive($options, $field['options']));
         }
 
-        $formBuilder->add('Submit', SubmitType::class, ['translation_domain' => $this->translationDomain]);
-
         return $formBuilder->getForm();
+    }
+
+    public function generateObjectUrl($name, $object, array $parameters = [], $absolute = RoutingUrlGeneratorInterface::ABSOLUTE_PATH)
+    {
+        $metaData = $this->objectManager->getMetadataFactory()->getMetadataFor($this->entity);
+        $platform = $this->objectManager->getConnection()->getDatabasePlatform();
+
+        $identifiers = [];
+
+        foreach ($metaData->getIdentifierValues($object) as $name => $value)
+        {
+            if (!\is_object($value)) {
+                $identifiers[] = $value;
+
+                continue;
+            }
+
+            if (method_exists($value, '__toString')) {
+                $identifiers[] = (string) $value;
+
+                continue;
+            }
+
+            $fieldType = $metaData->getTypeOfField($name);
+            $type = $fieldType && Type::hasType($fieldType) ? Type::getType($fieldType) : null;
+            if ($type) {
+                $identifiers[] = $type->convertToDatabaseValue($value, $platform);
+
+                continue;
+            }
+
+            foreach ($metaData->getIdentifierValues($value) as $value) {
+                $identifiers[] = $value;
+            }
+        }
+
+        $parameters['id'] = implode('~', $identifiers);
+
+        return $this->generateUrl($name, $parameters, $absolute);
     }
 }

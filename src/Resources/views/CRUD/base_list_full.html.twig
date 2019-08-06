@@ -1,0 +1,98 @@
+{#The full list. Show filter, actions, pager and so on.#}
+
+{% extends '@TeebbSBAdmin2/CRUD/base_list.html.twig' %}
+
+{% block teebb_head_title %}
+    {{ admin.label ~ ' ' ~ action ~ ' | ' ~ 'TeebbSBAdmin2'  |trans({}, teebb_sbadmin2.transDomain) }}
+{% endblock %}
+
+{% block heading_label %}
+    {{ admin.label ~ ' ' ~ action |trans({}, teebb_sbadmin2.transDomain) }}
+{% endblock %}
+
+{% block heading_link %}
+    <a href="{{ path(admin.routes.getRouteName('create')) }}" class="btn btn-sm btn-primary shadow-sm">
+        <i class="fas fa-plus-circle fa-sm text-white-50 pr-2"></i>
+        {{ 'Create'|trans({}, teebb_sbadmin2.transDomain) ~' '~admin.label|trans({}, teebb_sbadmin2.transDomain) }}
+    </a>
+{% endblock %}
+
+{% block content %}
+
+    {% if filterForm is not empty %}
+    <!--List Filter-->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="list-filter">
+                {% include teebb_sbadmin2.sbadmin2Config.getTemplate('base_list_filter_form')  with filterForm %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!--List Contents-->
+    <div class="card border-top-primary shadow mb-4">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">{{ admin.label ~ ' ' ~ action |trans({}, teebb_sbadmin2.transDomain) }}</h6>
+            <div class="dropdown no-arrow">
+                <a class="dropdown-toggle" href="{{ path(admin.routes.getRouteName('create')) }}" role="button" id="dropdownNewContentsMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-500"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownNewContentsMenuLink">
+                    <a class="dropdown-item" href="{{ path(admin.routes.getRouteName('create')) }}"><i class="fa fa-plus-circle text-gray-500 pr-2"></i>{{ 'Create'|trans({}, teebb_sbadmin2.transDomain) ~' '~admin.label|trans({}, teebb_sbadmin2.transDomain) }}</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+
+            <div class="content-list mt-3">
+
+                <form action="{{ path(admin.routes.getRouteName('batch'),{'filter': app.request.query.all}) }}" method="post">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('teebb.batch') }}">
+                    <!--List Contents Table-->
+                    <div class="table-responsive">
+                        {% include teebb_sbadmin2.sbadmin2Config.getTemplate('base_list_full_table') with {'pagination': pagination, 'admin': admin, 'list_item_actions': list_item_actions, 'list_item_properties': list_item_properties} %}
+                    </div>
+
+                    <!--Batch options-->
+                    <div class="bat-option d-md-flex justify-content-md-between mb-3">
+                        <div class="form-inline col-12 col-md-6 d-flex align-items-center justify-content-start">
+                            <div class="form-group pr-2 mb-0">
+                                <input id="all_elements" type="checkbox" class="form-check-inline" name="all_elements">
+                                <label for="all_elements" >{{ 'All elements(%count%)'|trans({'%count%':pagination.getTotalItemCount}, teebb_sbadmin2.transDomain) }}</label>
+                            </div>
+                            <div class="form-group pr-2 mb-0">
+                                <label for="select_bat_option" class="sr-only">{{ 'Batch operation'|trans({}, teebb_sbadmin2.transDomain) }}</label>
+                                <select id="select_bat_option" class="form-control form-control-sm" name="action">
+                                    <option selected>{{ 'Batch operation'|trans({}, teebb_sbadmin2.transDomain) }}</option>
+                                    {% for action in admin.batchActions %}
+                                        <option value="{{ action['action'] }}">{{ action.option_label|trans({}, teebb_sbadmin2.transDomain) }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <button class="btn btn-secondary btn-icon-split btn-sm">
+                                <span class="icon text-white-50"><i class="fas fa-check"></i></span>
+                                <span class="text text-nowrap">{{ 'Apply'|trans({}, teebb_sbadmin2.transDomain) }}</span>
+                            </button>
+                        </div>
+
+                        <div class="form-inline col-12 col-md-6 d-flex justify-content-end">
+                            <label for="select_page_limit">{{ 'Total %count% - Page Limit:'|trans({'%count%':pagination.getTotalItemCount}, teebb_sbadmin2.transDomain) }}</label>
+                            <select id="select_page_limit" class="form-control form-control-sm select-page-limit" name="limit">
+                                <option selected value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    {{ knp_pagination_render(pagination,teebb_sbadmin2.sbadmin2Config.getTemplate('bootstrap4_pager'),{},{align: 'right'}) }}
+
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

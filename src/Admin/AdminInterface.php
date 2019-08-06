@@ -128,6 +128,10 @@ interface AdminInterface extends ParentAdminInterface
 
     public function setCrudConfigs(array $crudConfigs): void;
 
+    public function getBatchActions(): array;
+
+    public function setBatchActions(array $batchActions): void;
+
     public function getRest(): array;
 
     public function setRest(array $rest): void;
@@ -215,6 +219,11 @@ interface AdminInterface extends ParentAdminInterface
     public function getFormConfigs(): array;
 
     public function setFormConfigs(array $formConfigs): void;
+
+    public function getListActionType(): string;
+
+    public function setListActionType(string $listActionType): void;
+
 
     public function getForm(string $action): FormInterface;
 }

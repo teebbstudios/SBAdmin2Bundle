@@ -104,14 +104,16 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('dashboard')->defaultValue('@TeebbSBAdmin2/Core/dashboard.html.twig')->cannotBeEmpty()->end()
                         ->scalarNode('knp_sidebar_menu')->defaultValue('@TeebbSBAdmin2/Menu/teebb_menu.html.twig')->cannotBeEmpty()->end()
                         ->scalarNode('base_list')->defaultValue('@TeebbSBAdmin2/CRUD/base_list.html.twig')->cannotBeEmpty()->end()
+                        ->scalarNode('base_list_full')->defaultValue('@TeebbSBAdmin2/CRUD/base_list_full.html.twig')->cannotBeEmpty()->end()
+                        ->scalarNode('base_list_full_table')->defaultValue('@TeebbSBAdmin2/CRUD/base_list_full_table.html.twig')->cannotBeEmpty()->end()
+                        ->scalarNode('base_list_filter_form')->defaultValue('@TeebbSBAdmin2/CRUD/base_list_filter_form.html.twig')->cannotBeEmpty()->end()
+                        ->scalarNode('base_list_simple')->defaultValue('@TeebbSBAdmin2/CRUD/base_list_simple.html.twig')->cannotBeEmpty()->end()
+
                         ->scalarNode('base_edit')->defaultValue('@TeebbSBAdmin2/CRUD/base_edit.html.twig')->cannotBeEmpty()->end()
-                        ->scalarNode('base_create')->defaultValue('@TeebbSBAdmin2/CRUD/base_create.html.twig')->cannotBeEmpty()->end()
-                        ->scalarNode('simple_list')->defaultValue('@TeebbSBAdmin2/CRUD/simple_list.html.twig')->cannotBeEmpty()->end()
-                        ->scalarNode('full_list')->defaultValue('@TeebbSBAdmin2/CRUD/full_list.html.twig')->cannotBeEmpty()->end()
-                        ->scalarNode('full_list_table')->defaultValue('@TeebbSBAdmin2/CRUD/full_list_table.html.twig')->cannotBeEmpty()->end()
-                        ->scalarNode('tab_simple_list')->defaultValue('@TeebbSBAdmin2/CRUD/tab_simple_list.html.twig')->cannotBeEmpty()->end()
-                        ->scalarNode('edit_form')->defaultValue('@TeebbSBAdmin2/CRUD/edit_form.html.twig')->cannotBeEmpty()->end()
-                        ->scalarNode('create_form')->defaultValue('@TeebbSBAdmin2/CRUD/create_form.html.twig')->cannotBeEmpty()->end()
+                        ->scalarNode('base_edit_form')->defaultValue('@TeebbSBAdmin2/CRUD/base_edit_form.html.twig')->cannotBeEmpty()->end()
+
+                        ->scalarNode('delete')->defaultValue('@TeebbSBAdmin2/CRUD/delete.html.twig')->cannotBeEmpty()->end()
+
                         ->scalarNode('bootstrap4_pager')->defaultValue('@TeebbSBAdmin2/Pager/twitter_bootstrap_v4_pagination.html.twig')->cannotBeEmpty()->end()
                     ->end()
                 ->end()
@@ -354,6 +356,8 @@ class Configuration implements ConfigurationInterface
                                 ->end()
                             ->end()
 
+                            ->enumNode('action_type')->defaultValue('item')->values(['item','group'])->info('The action button style. item: single button, group: button with font icon.')->end()
+
                             ->arrayNode('rest')
                                 ->arrayPrototype()
                                     ->children()
@@ -367,7 +371,7 @@ class Configuration implements ConfigurationInterface
 
                             ->arrayNode('form')
                                 ->children()
-                                    ->arrayNode('fields')->defaultValue([])->info('The create edit form fields.')
+                                    ->arrayNode('fields')->info('The create edit form fields.')
                                         ->arrayPrototype()
                                             ->children()
                                                 ->scalarNode('property')->info('The property')->end()
@@ -485,7 +489,7 @@ class Configuration implements ConfigurationInterface
                                                 ->scalarNode('label')->end()
                                                 ->scalarNode('icon')->defaultValue('')->end()
                                                 ->scalarNode('class')->defaultValue('')->end()
-                                                ->enumNode('type')->defaultValue('item')->values(['item','group'])->info('The action button style. item: single button, group: button with font icon.')->end()
+                                                ->booleanNode('hide')->defaultFalse()->info('If action type is group, hide in dropdown button.')->end()
                                                 ->arrayNode('roles')
                                                     ->scalarPrototype()
                                                         ->defaultValue([])
@@ -514,10 +518,10 @@ class Configuration implements ConfigurationInterface
                                     ->end()
 
                                     ->arrayNode('batch_actions')->info('batch option for the list items.')
+                                        ->defaultValue([ ['action'=>'delete', 'option_label'=>'Batch delete','roles'=>[] ]])
                                         ->arrayPrototype()
                                             ->children()
                                                 ->scalarNode('action')->info('The batch option name.')->end()
-                                                ->scalarNode('option_name')->info('The option syntax name.')->end()
                                                 ->scalarNode('option_label')->info('The option syntax value.')->end()
                                                 ->arrayNode('roles')
                                                     ->scalarPrototype()

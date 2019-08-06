@@ -63,6 +63,12 @@ class AdminServicesCompilePass implements CompilerPassInterface
             $crudSettings['list'] = $adminConfig['list'];
             $definition->addMethodCall('setCrudConfigs', [$crudSettings]);
 
+            //Set batch actions
+            $definition->addMethodCall('setBatchActions', [$crudSettings['list']['batch_actions']]);
+
+            //Set list table action buttons type
+            $definition->addMethodCall('setListActionType', [$adminConfig['action_type']]);
+
             //Set default form fields.
             $definition->addMethodCall('setFormConfigs', [$adminConfig['form'] ?? []]);
 

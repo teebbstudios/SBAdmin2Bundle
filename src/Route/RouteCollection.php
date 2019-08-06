@@ -163,7 +163,6 @@ class RouteCollection
 
     public function getRouteName($name)
     {
-
         return $this->get($this->getCode($name))->getDefault('_teebb_name');
     }
 

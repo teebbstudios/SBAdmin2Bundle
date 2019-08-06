@@ -30,9 +30,17 @@
                 <source>List</source>
                 <target>列表</target>
             </trans-unit>
-            <trans-unit id="Add">
-                <source>Add</source>
+            <trans-unit id="Create">
+                <source>Create</source>
                 <target>添加</target>
+            </trans-unit>
+            <trans-unit id="Edit">
+                <source>Edit</source>
+                <target>编辑</target>
+            </trans-unit>
+            <trans-unit id="Delete">
+                <source>Delete</source>
+                <target>删除</target>
             </trans-unit>
             <trans-unit id="label_previous">
                 <source>label_previous</source>
@@ -53,6 +61,78 @@
             <trans-unit id="Woooooo! It's Nothing! Empty! Blank!">
                 <source>Woooooo! It's Nothing! Empty! Blank!</source>
                 <target>这里还是空空如也！</target>
+            </trans-unit>
+            <trans-unit id="EDIT">
+                <source>EDIT</source>
+                <target>编辑</target>
+            </trans-unit>
+            <trans-unit id="DELETE">
+                <source>DELETE</source>
+                <target>删除</target>
+            </trans-unit>
+            <trans-unit id="Save">
+                <source>Save</source>
+                <target>保存</target>
+            </trans-unit>
+            <trans-unit id="Save and back to list">
+                <source>Save and back to list</source>
+                <target>保存并返回列表</target>
+            </trans-unit>
+            <trans-unit id="Save and create a new one">
+                <source>Save and create a new one</source>
+                <target>保存并创建新的</target>
+            </trans-unit>
+            <trans-unit id="Or">
+                <source>Or</source>
+                <target>或</target>
+            </trans-unit>
+            <trans-unit id="Update">
+                <source>Update</source>
+                <target>更新</target>
+            </trans-unit>
+            <trans-unit id="Update and back to list">
+                <source>Update and back to list</source>
+                <target>更新并返回列表</target>
+            </trans-unit>
+            <trans-unit id="successfully created!">
+                <source>successfully created!</source>
+                <target>已成功创建！</target>
+            </trans-unit>
+            <trans-unit id="successfully updated!">
+                <source>successfully updated!</source>
+                <target>已成功更新！</target>
+            </trans-unit>
+            <trans-unit id="Confirm deletion?">
+                <source>Confirm deletion?</source>
+                <target>确认要删除吗？</target>
+            </trans-unit>
+            <trans-unit id="Delete the selected data? Data related to it will also be deleted. Please confirm.">
+                <source>Delete the selected data? Data related to it will also be deleted. Please confirm.</source>
+                <target>确认要删除选定数据吗？与之相关的数据也会一并删除，请确认。</target>
+            </trans-unit>
+            <trans-unit id="Yes,delete it!">
+                <source>Yes,delete it!</source>
+                <target>是的，删除</target>
+            </trans-unit>
+            <trans-unit id="All elements(%count%)">
+                <source>All elements(%count%)</source>
+                <target>所有元素（%count%）</target>
+            </trans-unit>
+            <trans-unit id="Batch operation">
+                <source>Batch operation</source>
+                <target>批量操作</target>
+            </trans-unit>
+            <trans-unit id="Batch delete">
+                <source>Batch delete</source>
+                <target>批量删除</target>
+            </trans-unit>
+            <trans-unit id="Apply">
+                <source>Apply</source>
+                <target>应用</target>
+            </trans-unit>
+            <trans-unit id="Total %count% - Page Limit:">
+                <source>Total %count% - Page Limit:</source>
+                <target>共%count%条，每页显示</target>
             </trans-unit>
         </body>
     </file>

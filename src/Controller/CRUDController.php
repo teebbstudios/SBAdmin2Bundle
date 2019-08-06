@@ -5,6 +5,7 @@ namespace Teebb\SBAdmin2Bundle\Controller;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Teebb\SBAdmin2Bundle\Admin\AdminInterface;
@@ -83,9 +84,9 @@ class CRUDController extends AbstractFOSRestController
         $filterProperties = $this->admin->getAccessFilterProperties();
 
         $filterParameters = $request->get('filter') ?? [];
-
+        $orderBy = ['id' => 'DESC'];
         $pagination = $this->paginator->paginate(
-            $this->admin->getConditionalQueryResults($filterParameters),
+            $this->admin->getConditionalQueryResults($filterParameters, $orderBy),
             $request->query->getInt('page', 1)/*page number*/,
             $request->query->getInt('limit', 10)/*page number*/
         );
@@ -107,7 +108,7 @@ class CRUDController extends AbstractFOSRestController
             }
         }
 
-        return $this->render($this->templateRegistry->getTemplate('full_list'), [
+        return $this->render($this->templateRegistry->getTemplate('base_list_full'), [
                 'filterProperties' => $filterProperties,
                 'filterForm' => $filterForm == null ? null : $filterForm->createView(),
                 'pagination' => $pagination,
@@ -146,21 +147,24 @@ class CRUDController extends AbstractFOSRestController
             $em->persist($objectData);
             $em->flush();
 
-            $this->addFlash('success', sprintf('Successfully saved!'));
+            $this->addFlash('success', sprintf('successfully updated!'));
+
+            if (key_exists('button-to-list', $request->request->all())) {
+                return $this->redirectToRoute($this->admin->getRoutes()->getRouteName('list'));
+            }
         }
 
-        return $this->render($this->templateRegistry->getTemplate('edit_form'), [
+        return $this->render($this->templateRegistry->getTemplate('base_edit'), [
                 'object' => $object,
                 'action' => 'Edit',
                 'admin' => $this->admin,
-                'editForm' => $editForm->createView(),
+                'form' => $editForm->createView(),
             ]
         );
     }
 
     public function createAction(Request $request)
     {
-
         $this->admin->checkAccess('create');
 
         $createForm = $this->admin->getForm('create');
@@ -176,14 +180,20 @@ class CRUDController extends AbstractFOSRestController
             $em->persist($objectData);
             $em->flush();
 
-            $this->addFlash('success', sprintf('Successfully created!'));
+            $this->addFlash('success', sprintf('successfully created!'));
+
+            if (key_exists('button-to-list', $request->request->all())) {
+                return $this->redirectToRoute($this->admin->getRoutes()->getRouteName('list'));
+            } elseif (key_exists('button-to-new', $request->request->all())) {
+                return $this->redirectToRoute($this->admin->getRoutes()->getRouteName('create'), [], 301);
+            }
 
         }
 
-        return $this->render($this->templateRegistry->getTemplate('create_form'), [
+        return $this->render($this->templateRegistry->getTemplate('base_edit'), [
                 'action' => 'Create',
                 'admin' => $this->admin,
-                'createForm' => $createForm->createView(),
+                'form' => $createForm->createView(),
             ]
         );
     }
@@ -200,14 +210,41 @@ class CRUDController extends AbstractFOSRestController
 
         $this->admin->checkAccess('delete', $object);
 
-        $em = $this->admin->getObjectManager();
+        if ('DELETE' === $request->getMethod()) {
+            if ($this->isCsrfTokenValid('teebb.delete', $request->get('_csrf_token'))) {
 
-        $em->remove($object);
+                $em = $this->admin->getObjectManager();
 
-        $em->flush();
+                $em->remove($object);
 
-        $this->addFlash('success', sprintf('Successfully delete!'));
+                $em->flush();
 
-        return $this->redirectToRoute($this->admin->getRoutes()->getRouteName('list'));
+                $this->addFlash('success', sprintf('successfully delete!'));
+
+                return $this->redirectToRoute($this->admin->getRoutes()->getRouteName('list'));
+            }
+        }
+
+        return $this->render($this->templateRegistry->getTemplate('delete'), [
+                'action' => 'Delete',
+                'admin' => $this->admin,
+                'object' => $object
+            ]
+        );
+    }
+
+    public function batchAction(Request $request)
+    {
+        $queryParameters = $request->query->all;
+
+        if ($request->getMethod() !== 'POST') {
+            throw $this->createNotFoundException(sprintf('Invalid request type "%s", POST expected', $request->getMethod()));
+        }
+
+        if (!$this->isCsrfTokenValid('teebb.batch', $request->request->get('_csrf_token'))) {
+            throw new HttpException(400, 'The csrf token is not valid, CSRF attack?');
+        } else {
+
+        }
     }
 }

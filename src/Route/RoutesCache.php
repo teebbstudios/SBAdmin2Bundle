@@ -67,7 +67,6 @@ class RoutesCache
             }
 
             foreach ($admin->getRoutes()->getElements() as $code => $route) {
-                var_dump($code);
                 $routes[$code] = $route->getDefault('_teebb_name');
             }
 
