@@ -4,32 +4,32 @@
 </div>
 <div class="card-footer">
     {% if object is defined and action == 'Edit' %}
-        <button class="btn btn-primary shadow-sm" name="button-to-save">
+        <button class="btn btn-primary btn-sm shadow-sm" name="button-to-save">
             <i class="fas fa-save fa-sm text-white-50 pr-2"></i>
             {{ 'Update'|trans({}, teebb_sbadmin2.transDomain) }}
         </button>
         {% if admin.hasRoute('list') and admin.hasAccess('list', object) %}
-            <button class="btn btn-primary shadow-sm" name="button-to-list">
+            <button class="btn btn-primary btn-sm shadow-sm" name="button-to-list">
                 <i class="fas fa-list fa-sm text-white-50 pr-2"></i>
                 {{ 'Update and back to list'|trans({}, teebb_sbadmin2.transDomain) }}
             </button>
         {% endif %}
         {% if admin.hasRoute('delete') and admin.hasAccess('delete', object) %}
             {{ 'Or'|trans({}, teebb_sbadmin2.transDomain) }}
-            <a href="{{ path(admin.routes.getRouteName('delete'), {'id': object.id}) }}" class="btn btn-danger shadow-sm">
+            <a href="{{ path(admin.routes.getRouteName('delete'), {'id': object.id}) }}" class="btn btn-danger btn-sm shadow-sm">
                 <i class="fas fa-save fa-sm text-white-50 pr-2"></i>
                 {{ 'Delete'|trans({}, teebb_sbadmin2.transDomain) }}
             </a>
         {% endif %}
 
     {% elseif action == 'Create' %}
-        <button class="btn btn-primary shadow-sm" name="button-to-save">
+        <button class="btn btn-primary btn-sm shadow-sm" name="button-to-save">
             <i class="fas fa-save fa-sm text-white-50 pr-2"></i>
             {{ 'Save'|trans({}, teebb_sbadmin2.transDomain) }}
         </button>
 
         {% if admin.hasRoute('list') and admin.hasAccess('list') %}
-            <button class="btn btn-primary shadow-sm" name="button-to-list">
+            <button class="btn btn-primary btn-sm shadow-sm" name="button-to-list">
                 <i class="fas fa-list fa-sm text-white-50 pr-2"></i>
                 {{ 'Save and back to list'|trans({}, teebb_sbadmin2.transDomain) }}
             </button>
@@ -37,8 +37,8 @@
 
         {% if admin.hasRoute('create') and admin.hasAccess('create') %}
             {{ 'Or'|trans({}, teebb_sbadmin2.transDomain) }}
-            <button class="btn btn-primary shadow-sm" name="button-to-new">
-                <i class="fas fa-save fa-sm text-white-50 pr-2"></i>
+            <button class="btn btn-primary btn-sm shadow-sm" name="button-to-new">
+                <i class="fas fa-redo fa-sm text-white-50 pr-2"></i>
                 {{ 'Save and create a new one'|trans({}, teebb_sbadmin2.transDomain) }}
             </button>
         {% endif %}
