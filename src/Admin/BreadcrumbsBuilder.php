@@ -88,7 +88,7 @@ final class BreadcrumbsBuilder implements BreadcrumbsBuilderInterface
         $menu = $this->createMenuItem(
             $admin,
             $menu,
-            sprintf('%s_list', $admin->getEntityClassLabel()),
+            sprintf('%s_manage', $admin->getEntityClassLabel()),
             $admin->getTranslationDomain(),
             [
                 'uri' => $admin->hasRoute('list') && $admin->hasAccess('list') ?
