@@ -1,5 +1,84 @@
 (function ($) {
     "use strict"; // Start of use strict
+    var urlUtil = {
+        /**
+         * Url分析
+         * @param {String} url 要分析的URL
+         * @return {Object} 返回包含'url', 'scheme', 'slash', 'host', 'port', 'path', 'query', 'hash'的数组
+         */
+        analyseUrl: function (url) {
+            var parse_url = /^(?:([A-Za-z]+):)?(\/{0,3})([0-9.\-A-Za-z]+)(?::(\d+))?(?:\/([^?#]*))?(?:\?([^#]*))?(?:#(.*))?$/;
+            var analyseResult = parse_url.exec(url);
+            var fields = ['url', 'scheme', 'slash', 'host', 'port', 'path', 'query', 'hash'];
+            var result = new Object();
+            $.each(fields, function (n, item) {
+                result[item] = analyseResult[n];
+            });
+            return result;
+        },
+
+        /**
+         * 查询/判断url是否有某个参数,如果有该参数，返回参数的值；没有返回null
+         * @param {String} url 要查询的url
+         * @param {String} name 要查询的参数名
+         * @return {String} 参数的值
+         */
+        hasParameter: function (url, name) {
+            var urlAnalyse = this.analyseUrl(url);
+            var urlParam = urlAnalyse.query;
+            if (typeof (urlParam) != 'undefined') {
+                var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+                var r = urlParam.match(reg);
+                if (r != null) {
+                    return unescape(r[2]);
+                }
+                //有该参数，但是值为null
+                return "";
+            }
+            //没有该参数
+            return null;
+        },
+        /**
+         * url增加参数
+         * @param {String} url 要修改的url
+         * @param {String} name 要增加的参数名
+         * @param {String} value 对应的参数值
+         * @return {String} 修改后的结果
+         */
+        addParameter: function (url, name, value) {
+            var newUrl = url;
+            var paremeter = name + "=" + value;
+            if (url.match("[\?]")) {
+                //存在其他参数，用&连接
+                newUrl = url + "&" + paremeter;
+            } else {
+                //没有参数，用?连接
+                newUrl = url + "?" + paremeter;
+            }
+            return newUrl;
+        },
+
+        /**
+         * 替换Url参数
+         * @param {String} url 要修改的Url
+         * @param {String} name 要修改的参数名
+         * @param {String} value 对应的参数的值
+         * @return {String} 修改后的Url
+         */
+        replaceParameter: function (url, name, value) {
+            var newUrl = url;
+            if (this.hasParameter(url, name)) {
+                //有该参数，修改
+                var replacedPar = eval('/(' + name + '=)([^&]*)/gi');
+                newUrl = url.replace(replacedPar, name + '=' + value);
+            } else {
+                //没有该参数，增加
+                newUrl = this.addParameter(url, name, value);
+            }
+            return newUrl;
+        },
+
+    };
 
     // Toggle the side navigation
     $("#sidebarToggle, #sidebarToggleTop").on('click', function (e) {
@@ -212,7 +291,7 @@
     });
 
     //编辑菜单项页面，展开收缩菜单项，点击事件
-    $('.dd-item .accordion-arrow').on('click', function(e){
+    $('.dd-item .accordion-arrow').on('click', function (e) {
         var $collapse = $(e.target).closest('.dd-item').find('.collapse');
         $collapse.collapse('toggle');
     });
@@ -220,18 +299,27 @@
     //评论列表页评论操作列表显示
     $('td.js-comment-td').hover(function (e) {
         var $tdEl = $(e.target);
-        $tdEl.find('.comment-option').css('left','0px');
-    },function (e) {
+        $tdEl.find('.comment-option').css('left', '0px');
+    }, function (e) {
         var $tdEl = $(e.target);
-        $tdEl.find('.comment-option').css('left','-9999em');
+        $tdEl.find('.comment-option').css('left', '-9999em');
     });
 
     //编辑评论页面修改提交时间事件
-    $('button#edit_comment_time_btn').on('click',function (e) {
+    $('button#edit_comment_time_btn').on('click', function (e) {
         var $timeInput = $(e.target).closest('.comment-time').find('input#comment_time');
         console.log($timeInput);
         $timeInput.removeAttr('disabled');
         $(e.target).hide();
     });
 
+    //列表页面 Limit 事件
+    $('#select_page_limit').change(function () {
+        var $limit = $(this).val();
+        var $oldUrl = window.location.href;
+
+        var $newUrl = urlUtil.replaceParameter($oldUrl, 'limit', $limit);
+
+        window.location.replace($newUrl);
+    });
 })(jQuery); // End of use strict

@@ -106,9 +106,9 @@
                 <source>Confirm deletion?</source>
                 <target>确认要删除吗？</target>
             </trans-unit>
-            <trans-unit id="Delete the selected data? Data related to it will also be deleted. Please confirm.">
-                <source>Delete the selected data? Data related to it will also be deleted. Please confirm.</source>
-                <target>确认要删除选定数据吗？与之相关的数据也会一并删除，请确认。</target>
+            <trans-unit id="Delete the selected data? Data related to it will also be deleted. Please confirm!">
+                <source>Delete the selected data? Data related to it will also be deleted. Please confirm!</source>
+                <target>确认要删除选定数据吗？与之相关的数据也会一并删除，请确认!</target>
             </trans-unit>
             <trans-unit id="Yes,delete it!">
                 <source>Yes,delete it!</source>
@@ -133,6 +133,38 @@
             <trans-unit id="Total %count% - Page Limit:">
                 <source>Total %count% - Page Limit:</source>
                 <target>共%count%条，每页显示</target>
+            </trans-unit>
+            <trans-unit id="Action aborted. No items were selected.">
+                <source>Action aborted. No items were selected.</source>
+                <target>批量操作取消，没有选中任何项。</target>
+            </trans-unit>
+            <trans-unit id="Confirm batch action %action%?">
+                <source>Confirm batch action %action%?</source>
+                <target>确认要执行批量%action%?</target>
+            </trans-unit>
+            <trans-unit id="Yes.%action% it!">
+                <source>Yes.%action% it!</source>
+                <target>是的.%action%!</target>
+            </trans-unit>
+            <trans-unit id="Return to list">
+                <source>Return to list</source>
+                <target>返回列表</target>
+            </trans-unit>
+            <trans-unit id=" Batch ">
+                <source> Batch </source>
+                <target>批量</target>
+            </trans-unit>
+            <trans-unit id="Batch Delete">
+                <source>Batch Delete</source>
+                <target>批量删除</target>
+            </trans-unit>
+            <trans-unit id="%action% the selected data? Data related to it will also be %actioned%. Please confirm!">
+                <source>%action% the selected data? Data related to it will also be %actioned%. Please confirm!</source>
+                <target>确认要%action%选定数据吗？与之相关的数据也会一并%action%，请确认!</target>
+            </trans-unit>
+            <trans-unit id="Selected items have been successfully deleted.">
+                <source>Selected items have been successfully deleted.</source>
+                <target>您选中的项目已经成功删除。</target>
             </trans-unit>
         </body>
     </file>

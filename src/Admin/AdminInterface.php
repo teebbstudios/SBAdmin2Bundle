@@ -224,6 +224,7 @@ interface AdminInterface extends ParentAdminInterface
 
     public function setListActionType(string $listActionType): void;
 
+    public function checkBatchActionsAccess(string $batchActionName);
 
     public function getForm(string $action): FormInterface;
 }

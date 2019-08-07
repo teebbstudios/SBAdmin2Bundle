@@ -47,7 +47,7 @@
 
             <div class="content-list mt-3">
 
-                <form action="{{ path(admin.routes.getRouteName('batch'),{'filter': app.request.query.all}) }}" method="post">
+                <form action="{{ path(admin.routes.getRouteName('batch'),{"filter":app.request.query.get('filter')}) }}" method="post">
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token('teebb.batch') }}">
                     <!--List Contents Table-->
                     <div class="table-responsive">
@@ -64,7 +64,7 @@
                             <div class="form-group pr-2 mb-0">
                                 <label for="select_bat_option" class="sr-only">{{ 'Batch operation'|trans({}, teebb_sbadmin2.transDomain) }}</label>
                                 <select id="select_bat_option" class="form-control form-control-sm" name="action">
-                                    <option selected>{{ 'Batch operation'|trans({}, teebb_sbadmin2.transDomain) }}</option>
+{#                                    <option value="batch_operation" selected>{{ 'Batch operation'|trans({}, teebb_sbadmin2.transDomain) }}</option>#}
                                     {% for action in admin.batchActions %}
                                         <option value="{{ action['action'] }}">{{ action.option_label|trans({}, teebb_sbadmin2.transDomain) }}</option>
                                     {% endfor %}
@@ -78,11 +78,11 @@
 
                         <div class="form-inline col-12 col-md-6 d-flex justify-content-end">
                             <label for="select_page_limit">{{ 'Total %count% - Page Limit:'|trans({'%count%':pagination.getTotalItemCount}, teebb_sbadmin2.transDomain) }}</label>
-                            <select id="select_page_limit" class="form-control form-control-sm select-page-limit" name="limit">
+                            <select id="select_page_limit" class="form-control form-control-sm select-page-limit">
                                 <option selected value="10">10</option>
-                                <option value="25">25</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
+                                <option {% if app.request.query.get('limit') == 25 %}selected{% endif %} value="25">25</option>
+                                <option {% if app.request.query.get('limit') == 50 %}selected{% endif %} value="50">50</option>
+                                <option {% if app.request.query.get('limit') == 100 %}selected{% endif %} value="100">100</option>
                             </select>
                         </div>
                     </div>

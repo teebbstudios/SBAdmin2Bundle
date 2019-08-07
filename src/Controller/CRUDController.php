@@ -2,12 +2,16 @@
 
 namespace Teebb\SBAdmin2Bundle\Controller;
 
+use Doctrine\Common\Inflector\Inflector;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Teebb\SBAdmin2Bundle\Admin\AdminInterface;
 use Teebb\SBAdmin2Bundle\Templating\TemplateRegistryInterface;
 
@@ -235,7 +239,7 @@ class CRUDController extends AbstractFOSRestController
 
     public function batchAction(Request $request)
     {
-        $queryParameters = $request->query->all;
+        $filterParameters = $request->query->all();
 
         if ($request->getMethod() !== 'POST') {
             throw $this->createNotFoundException(sprintf('Invalid request type "%s", POST expected', $request->getMethod()));
@@ -244,7 +248,118 @@ class CRUDController extends AbstractFOSRestController
         if (!$this->isCsrfTokenValid('teebb.batch', $request->request->get('_csrf_token'))) {
             throw new HttpException(400, 'The csrf token is not valid, CSRF attack?');
         } else {
+            $confirmation = $request->get('confirmation', false);
 
+            if ($data = json_decode((string)$request->get('data'), true)) {
+                $action = $data['action'];
+                $idx = $data['idx'];
+                $allElements = $data['all_elements'];
+                $request->request->replace(array_merge($request->request->all(), $data));
+            } else {
+                $request->request->set('idx', $request->get('idx', []));
+                $request->request->set('all_elements', $request->get('all_elements', false));
+
+                $action = $request->get('action');
+                $idx = $request->get('idx');
+                $allElements = $request->get('all_elements');
+                $data = $request->request->all();
+
+                unset($data['_csrf_token']);
+            }
+
+            $batchActions = $this->admin->getBatchActions();
+            foreach ($batchActions as $batchAction) {
+                if (!\in_array($action, $batchAction)) {
+                    throw new \RuntimeException(sprintf('The `%s` batch action is not defined', $action));
+                }
+            }
+
+            $camelizedAction = Inflector::classify($action);
+            $isRelevantAction = sprintf('batchAction%sIsRelevant', $camelizedAction);
+
+            if (method_exists($this, $isRelevantAction)) {
+                $nonRelevantMessage = \call_user_func([$this, $isRelevantAction], $idx, $allElements, $request);
+            } else {
+                $nonRelevantMessage = 0 !== \count($idx) || $allElements; // at least one item is selected
+            }
+
+            if (!$nonRelevantMessage) { // default non relevant message (if false of null)
+                $nonRelevantMessage = 'Action aborted. No items were selected.';
+            }
+
+            if (true !== $nonRelevantMessage) {
+                $this->addFlash('warning', $nonRelevantMessage);
+
+                return $this->redirectToRoute($this->admin->getRoutes()->getRouteName('list'), $filterParameters);
+            }
+
+            if ('ok' !== $confirmation) {
+
+                $template = $this->templateRegistry->getTemplate('batch_confirmation');
+
+                return $this->render($template, [
+                    'action' => $this->container->get('translator')->trans($camelizedAction, [], 'TeebbSBAdmin2Bundle'),
+                    'admin' => $this->admin,
+                    'data' => $data,
+                ]);
+            }
+
+            // execute the action, batchActionXxxxx
+            $finalAction = sprintf('batchAction%s', $camelizedAction);
+            if (!method_exists($this, $finalAction)) {
+                throw new \RuntimeException(sprintf('A `%s::%s` method must be callable', \get_class($this), $finalAction));
+            }
+            if (\count($idx) == 0 && !$allElements) {
+                $this->addFlash('warning', 'Action aborted. No items were selected.');
+
+                return $this->redirectToRoute($this->admin->getRoutes()->getRouteName('list'), $filterParameters);
+            }
+
+            return \call_user_func([$this, $finalAction], $request);
         }
+    }
+
+    /**
+     * Batch delete.
+     */
+    public function batchActionDelete(Request $request)
+    {
+        $this->admin->checkBatchActionsAccess('delete');
+
+        $data = json_decode($request->get('data'), true);
+
+        /**@var EntityManagerInterface $em * */
+        $em = $this->admin->getObjectManager();
+
+        if ($data['all_elements'] === 'on') {
+            $filter = $request->get('filter', []);
+            /**@var Query $query * */
+            $query = $this->admin->getConditionalQueryResults($filter);
+
+            $batchSize = 20;
+            $i = 0;
+
+            $iterableResult = $query->iterate();
+            while (($row = $iterableResult->next()) !== false) {
+                $em->remove($row[0]);
+                if (($i % $batchSize) === 0) {
+                    $em->flush(); // Executes all deletions.
+                    $em->clear(); // Detaches all objects from Doctrine!
+                }
+                ++$i;
+            }
+            $em->flush();
+        } else {
+            $query = $em->createQuery('DELETE FROM ' . $this->admin->getEntityClass() . ' o WHERE o.id IN (:idx)');
+            $query->setParameter('idx', $data['idx']);
+            $deleteNum = $query->execute();
+            if ($deleteNum !== sizeof($data['idx'])) {
+                throw new \RuntimeException('Deleted count not equal selected item count.I think it does\'t happen!');
+            }
+        }
+
+        $this->addFlash('success', 'Selected items have been successfully deleted.');
+
+        return $this->redirectToRoute($this->admin->getRoutes()->getRouteName('list'), ['filter' => $request->query->get('filter')]);
     }
 }

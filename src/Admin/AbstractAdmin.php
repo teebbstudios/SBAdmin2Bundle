@@ -1094,4 +1094,20 @@ class AbstractAdmin implements AdminInterface
 
         return $this->generateUrl($name, $parameters, $absolute);
     }
+
+    public function checkBatchActionsAccess(string $batchActionName)
+    {
+        foreach ($this->batchActions as $batchAction) {
+            if ($batchAction['action'] === $batchActionName)
+            {
+                foreach($batchAction['roles'] as $role )
+                {
+                    if (false === $this->isGranted($role)) {
+                        throw new AccessDeniedException(sprintf('Access Denied to the batch action %s and role %s', $batchActionName, $role));
+                    }
+                }
+            }
+
+        }
+    }
 }

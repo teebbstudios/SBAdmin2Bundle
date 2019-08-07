@@ -21,7 +21,7 @@
     {% for item in pagination %}
         <tr>
             <td scope="row">
-                <input type="checkbox" class="form-check" value="{{ item.id }}">
+                <input type="checkbox" name="idx[]" class="form-check" value="{{ item.id }}">
             </td>
             {% for property in list_item_properties %}
                 <td class="{{ property.class }}">

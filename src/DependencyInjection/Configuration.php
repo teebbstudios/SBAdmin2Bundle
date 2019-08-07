@@ -112,6 +112,7 @@ class Configuration implements ConfigurationInterface
                         ->scalarNode('base_edit')->defaultValue('@TeebbSBAdmin2/CRUD/base_edit.html.twig')->cannotBeEmpty()->end()
                         ->scalarNode('base_edit_form')->defaultValue('@TeebbSBAdmin2/CRUD/base_edit_form.html.twig')->cannotBeEmpty()->end()
 
+                        ->scalarNode('batch_confirmation')->defaultValue('@TeebbSBAdmin2/CRUD/batch_confirmation.html.twig')->cannotBeEmpty()->end()
                         ->scalarNode('delete')->defaultValue('@TeebbSBAdmin2/CRUD/delete.html.twig')->cannotBeEmpty()->end()
 
                         ->scalarNode('bootstrap4_pager')->defaultValue('@TeebbSBAdmin2/Pager/twitter_bootstrap_v4_pagination.html.twig')->cannotBeEmpty()->end()
