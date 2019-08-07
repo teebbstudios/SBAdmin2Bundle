@@ -2,6 +2,8 @@
 
 namespace Teebb\SBAdmin2Bundle\Twig;
 
+use Teebb\SBAdmin2Bundle\Admin\BreadcrumbsBuilder;
+use Teebb\SBAdmin2Bundle\Admin\BreadcrumbsBuilderInterface;
 use Teebb\SBAdmin2Bundle\Config\TeebbSBAdmin2ConfigInterface;
 
 class GlobalVariables
@@ -16,10 +18,17 @@ class GlobalVariables
      */
     private $transDomain;
 
-    public function __construct(TeebbSBAdmin2ConfigInterface $sbadmin2Config)
+    /**
+     * @var BreadcrumbsBuilderInterface
+     */
+    private $breadcrumbsBuilder;
+
+
+    public function __construct(TeebbSBAdmin2ConfigInterface $sbadmin2Config, BreadcrumbsBuilderInterface $breadcrumbsBuilder)
     {
         $this->sbadmin2Config = $sbadmin2Config;
         $this->transDomain = $sbadmin2Config->getOption('default_label_catalogue');
+        $this->breadcrumbsBuilder = $breadcrumbsBuilder;
     }
 
     /**
@@ -38,5 +47,12 @@ class GlobalVariables
         return $this->transDomain;
     }
 
+    /**
+     * @return BreadcrumbsBuilder
+     */
+    public function getBreadcrumbsBuilder(): BreadcrumbsBuilder
+    {
+        return $this->breadcrumbsBuilder;
+    }
 
 }

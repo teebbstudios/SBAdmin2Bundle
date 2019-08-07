@@ -77,7 +77,7 @@ final class BreadcrumbsBuilder implements BreadcrumbsBuilderInterface
             $menu = $admin->getMenuFactory()->createItem('root');
 
             $menu = $menu->addChild(
-                'link_breadcrumb_dashboard',
+                'Dashboard',
                 [
                     'uri' => $admin->getRouteGenerator()->generate('teebb_sbadmin2_dashboard'),
                     'extras' => ['translation_domain' => $admin->getTranslationDomain()],

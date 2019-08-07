@@ -17,9 +17,15 @@
             <tag name="routing.loader"/>
         </service>
 
+        <!--BreadcrumbsBuilder-->
+        <service id="teebb.sbadmin2.breadcrumbs_builder" class="Teebb\SBAdmin2Bundle\Admin\BreadcrumbsBuilder" public="true">
+            <argument type="collection"/>
+        </service>
+
         <!--twig global variables-->
         <service id="teebb.sbadmin2.twig.global" class="Teebb\SBAdmin2Bundle\Twig\GlobalVariables" public="true">
             <argument type="service" id="teebb.sbadmin2.config"/>
+            <argument type="service" id="teebb.sbadmin2.breadcrumbs_builder"/>
         </service>
 
         <!-- templating -->
