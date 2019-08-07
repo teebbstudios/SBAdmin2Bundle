@@ -163,16 +163,17 @@
 
                     <!-- Topbar Search -->
                     {% block teebb_topbar_search %}
-                        {% if teebb_sbadmin2.sbadmin2Config.getOption('search') %}
+                        {% set searchOption = teebb_sbadmin2.sbadmin2Config.getOption('search') %}
+
+                        {% if searchOption is not empty and searchOption['roles'] is not empty and is_granted(searchOption['roles']) or searchOption['roles'] is empty %}
                         <li class="nav-item m-auto mx-1">
-                            <form class="d-none d-lg-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+                            <form action="{{ path('teebb_sbadmin2_search') }}" method="post" class="d-none d-lg-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
                                 <div class="input-group">
-                                    <input type="text" class="form-control bg-light border-0 small" placeholder="{{ 'search_placeholder'|trans({}, teebb_sbadmin2.transDomain) }}"
-                                           aria-label="Search" aria-describedby="basic-addon2">
+                                    <input type="text" class="form-control bg-light border-0 small" placeholder="{{ searchOption['placeholder']|trans({}, teebb_sbadmin2.transDomain) }}"
+                                          {% if keywords is defined %} value="{{ keywords}}"{% endif %} aria-label="{{ searchOption['placeholder'] }}" name="keywords" aria-describedby="basic-addon2">
+                                    <input type="hidden" value="{{ csrf_token('teebb.search') }}" name="_csrf_token">
                                     <div class="input-group-append">
-                                        <button class="btn btn-primary" type="button">
-                                            <i class="fas fa-search fa-sm"></i>
-                                        </button>
+                                        <button class="btn btn-primary"><i class="fas fa-search fa-sm"></i></button>
                                     </div>
                                 </div>
                             </form>
@@ -187,15 +188,14 @@
                             <!-- Dropdown - Messages -->
                             <div class="dropdown-menu dropdown-menu-search dropdown-search dropdown-menu-right p-3 shadow animated--grow-in"
                                  aria-labelledby="searchDropdown">
-                                <form class="form-inline mr-auto w-100 navbar-search">
+                                <form action="{{ path('teebb_sbadmin2_search') }}" method="post" class="form-inline mr-auto w-100 navbar-search">
                                     <div class="input-group">
-                                        <input type="text" class="form-control bg-light border-0 small"
-                                               placeholder="{{ 'search_placeholder'|trans({}, teebb_sbadmin2.transDomain) }}" aria-label="Search"
+                                        <input type="text" class="form-control bg-light border-0 small" name="keywords" {% if keywords is defined %} value="{{ keywords}}"{% endif %}
+                                               placeholder="{{ searchOption['placeholder']|trans({}, teebb_sbadmin2.transDomain) }}" aria-label="Search"
                                                aria-describedby="basic-addon2">
+                                        <input type="hidden" value="{{ csrf_token('teebb.search') }}" name="_csrf_token">
                                         <div class="input-group-append">
-                                            <button class="btn btn-primary" type="button">
-                                                <i class="fas fa-search fa-sm"></i>
-                                            </button>
+                                            <button class="btn btn-primary"><i class="fas fa-search fa-sm"></i></button>
                                         </div>
                                     </div>
                                 </form>

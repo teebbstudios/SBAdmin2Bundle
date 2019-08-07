@@ -1,13 +1,20 @@
 {#The full list. Show filter, actions, pager and so on.#}
+{% if app.request.attributes.get('_route') == 'teebb_sbadmin2_search' %}
+    {% set searchOption = teebb_sbadmin2.sbadmin2Config.getOption('search') %}
+    {% set keywords = filterParameters[searchOption['property'][0]] %}
+    {% set actionLabel = 'Search \'%keywords%\' Results'|trans({'%keywords%': keywords}, teebb_sbadmin2.transDomain) %}
+{% else %}
+    {% set actionLabel = action|trans({}, teebb_sbadmin2.transDomain) %}
+{% endif %}
 
 {% extends '@TeebbSBAdmin2/CRUD/base_list.html.twig' %}
 
 {% block teebb_head_title %}
-    {{ admin.label ~ ' ' ~ action ~ ' | ' ~ 'TeebbSBAdmin2'  |trans({}, teebb_sbadmin2.transDomain) }}
+    {{ admin.label|trans({}, teebb_sbadmin2.transDomain) ~ ' ' ~ actionLabel ~ ' | ' ~ 'TeebbSBAdmin2'  |trans({}, teebb_sbadmin2.transDomain) }}
 {% endblock %}
 
 {% block heading_label %}
-    {{ admin.label ~ ' ' ~ action |trans({}, teebb_sbadmin2.transDomain) }}
+    {{ admin.label|trans({}, teebb_sbadmin2.transDomain) ~ ' Manage'|trans({}, teebb_sbadmin2.transDomain) }}
 {% endblock %}
 
 {% block heading_link %}
@@ -19,27 +26,32 @@
 
 {% block content %}
 
-    {% if filterForm is not empty %}
-    <!--List Filter-->
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <div class="list-filter">
-                {% include teebb_sbadmin2.sbadmin2Config.getTemplate('base_list_filter_form')  with filterForm %}
+    {% if filterForm is not empty and app.request.attributes.get('_route') != 'teebb_sbadmin2_search' %}
+        <!--List Filter-->
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <div class="list-filter">
+                    {% include teebb_sbadmin2.sbadmin2Config.getTemplate('base_list_filter_form')  with filterForm %}
+                </div>
             </div>
         </div>
-    </div>
     {% endif %}
 
     <!--List Contents-->
     <div class="card border-top-primary shadow mb-4">
         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">{{ admin.label ~ ' ' ~ action |trans({}, teebb_sbadmin2.transDomain) }}</h6>
+            <h6 class="m-0 font-weight-bold text-primary">{{ admin.label|trans({}, teebb_sbadmin2.transDomain) ~ ' ' ~ actionLabel }}</h6>
             <div class="dropdown no-arrow">
-                <a class="dropdown-toggle" href="{{ path(admin.routes.getRouteName('create')) }}" role="button" id="dropdownNewContentsMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="dropdown-toggle" href="{{ path(admin.routes.getRouteName('create')) }}" role="button"
+                   id="dropdownNewContentsMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-500"></i>
                 </a>
-                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownNewContentsMenuLink">
-                    <a class="dropdown-item" href="{{ path(admin.routes.getRouteName('create')) }}"><i class="fa fa-plus-circle text-gray-500 pr-2"></i>{{ 'Create'|trans({}, teebb_sbadmin2.transDomain) ~' '~admin.label|trans({}, teebb_sbadmin2.transDomain) }}</a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
+                     aria-labelledby="dropdownNewContentsMenuLink">
+                    <a class="dropdown-item" href="{{ path(admin.routes.getRouteName('create')) }}">
+                        <i class="fa fa-plus-circle text-gray-500 pr-2"></i>
+                        {{ 'Create'|trans({}, teebb_sbadmin2.transDomain) ~' '~admin.label|trans({}, teebb_sbadmin2.transDomain) }}
+                    </a>
                 </div>
             </div>
         </div>
@@ -47,7 +59,8 @@
 
             <div class="content-list mt-3">
 
-                <form action="{{ path(admin.routes.getRouteName('batch'),{"filter":app.request.query.get('filter')}) }}" method="post">
+                <form action="{{ path(admin.routes.getRouteName('batch'),{"filter":app.request.query.get('filter')}) }}"
+                      method="post">
                     <input type="hidden" name="_csrf_token" value="{{ csrf_token('teebb.batch') }}">
                     <!--List Contents Table-->
                     <div class="table-responsive">
@@ -59,12 +72,13 @@
                         <div class="form-inline col-12 col-md-6 d-flex align-items-center justify-content-start">
                             <div class="form-group pr-2 mb-0">
                                 <input id="all_elements" type="checkbox" class="form-check-inline" name="all_elements">
-                                <label for="all_elements" >{{ 'All elements(%count%)'|trans({'%count%':pagination.getTotalItemCount}, teebb_sbadmin2.transDomain) }}</label>
+                                <label for="all_elements">{{ 'All elements(%count%)'|trans({'%count%':pagination.getTotalItemCount}, teebb_sbadmin2.transDomain) }}</label>
                             </div>
                             <div class="form-group pr-2 mb-0">
-                                <label for="select_bat_option" class="sr-only">{{ 'Batch operation'|trans({}, teebb_sbadmin2.transDomain) }}</label>
+                                <label for="select_bat_option"
+                                       class="sr-only">{{ 'Batch operation'|trans({}, teebb_sbadmin2.transDomain) }}</label>
                                 <select id="select_bat_option" class="form-control form-control-sm" name="action">
-{#                                    <option value="batch_operation" selected>{{ 'Batch operation'|trans({}, teebb_sbadmin2.transDomain) }}</option>#}
+                                    {#                                    <option value="batch_operation" selected>{{ 'Batch operation'|trans({}, teebb_sbadmin2.transDomain) }}</option>#}
                                     {% for action in admin.batchActions %}
                                         <option value="{{ action['action'] }}">{{ action.option_label|trans({}, teebb_sbadmin2.transDomain) }}</option>
                                     {% endfor %}
@@ -80,9 +94,13 @@
                             <label for="select_page_limit">{{ 'Total %count% - Page Limit:'|trans({'%count%':pagination.getTotalItemCount}, teebb_sbadmin2.transDomain) }}</label>
                             <select id="select_page_limit" class="form-control form-control-sm select-page-limit">
                                 <option selected value="10">10</option>
-                                <option {% if app.request.query.get('limit') == 25 %}selected{% endif %} value="25">25</option>
-                                <option {% if app.request.query.get('limit') == 50 %}selected{% endif %} value="50">50</option>
-                                <option {% if app.request.query.get('limit') == 100 %}selected{% endif %} value="100">100</option>
+                                <option {% if app.request.query.get('limit') == 25 %}selected{% endif %} value="25">25
+                                </option>
+                                <option {% if app.request.query.get('limit') == 50 %}selected{% endif %} value="50">50
+                                </option>
+                                <option {% if app.request.query.get('limit') == 100 %}selected{% endif %} value="100">
+                                    100
+                                </option>
                             </select>
                         </div>
                     </div>

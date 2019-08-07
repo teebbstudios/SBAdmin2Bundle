@@ -84,11 +84,14 @@ class CRUDController extends AbstractFOSRestController
         $this->admin->checkAccess('list');
 
         $listItemActions = $this->admin->getListItemActions();
+
         $listItemProperties = $this->admin->getListProperties();
+
         $filterProperties = $this->admin->getAccessFilterProperties();
 
         $filterParameters = $request->get('filter') ?? [];
         $orderBy = ['id' => 'DESC'];
+
         $pagination = $this->paginator->paginate(
             $this->admin->getConditionalQueryResults($filterParameters, $orderBy),
             $request->query->getInt('page', 1)/*page number*/,
@@ -120,6 +123,7 @@ class CRUDController extends AbstractFOSRestController
                 'admin' => $this->admin,
                 'list_item_actions' => $listItemActions,
                 'list_item_properties' => $listItemProperties,
+                'filterParameters' => $filterParameters
             ]
         );
     }

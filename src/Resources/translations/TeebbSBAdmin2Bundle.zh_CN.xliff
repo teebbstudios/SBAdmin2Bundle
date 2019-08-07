@@ -14,13 +14,29 @@
                 <source>Dashboard</source>
                 <target>控制台</target>
             </trans-unit>
-            <trans-unit id="search_placeholder">
-                <source>search_placeholder</source>
-                <target>搜索内容...</target>
+            <trans-unit id="Search Something">
+                <source>Search Something</source>
+                <target>搜索...</target>
+            </trans-unit>
+            <trans-unit id="Search '%keywords%' Results">
+                <source>Search '%keywords%' Results</source>
+                <target>搜索'%keywords%'结果</target>
             </trans-unit>
             <trans-unit id="Back to Dashboard">
                 <source>Back to Dashboard</source>
                 <target>返回控制台首页</target>
+            </trans-unit>
+            <trans-unit id="Article">
+                <source>Article</source>
+                <target>文章</target>
+            </trans-unit>
+            <trans-unit id="Title">
+                <source>Title</source>
+                <target>标题</target>
+            </trans-unit>
+            <trans-unit id=" Manage">
+                <source> Manage</source>
+                <target>管理</target>
             </trans-unit>
             <trans-unit id="Filter">
                 <source>Filter</source>

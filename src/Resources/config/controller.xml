@@ -8,9 +8,12 @@
             <argument>%teebb.sbadmin2.configuration.dashboard_blocks%</argument>
             <argument type="service" id="teebb.sbadmin2.config"/>
             <argument type="service" id="teebb.sbadmin2.template_registry"/>
-            <call method="setContainer">
-                <argument type="service" id="service_container"/>
-            </call>
+        </service>
+
+        <service id="Teebb\SBAdmin2Bundle\Controller\SearchController">
+            <tag name="controller.service_arguments"/>
+            <argument type="service" id="teebb.sbadmin2.config"/>
+            <argument type="service" id="teebb.sbadmin2.template_registry"/>
         </service>
 
         <service id="Teebb\SBAdmin2Bundle\Controller\CRUDController">

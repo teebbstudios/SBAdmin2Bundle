@@ -14,5 +14,8 @@
         <default key="_controller">Teebb\SBAdmin2Bundle\Controller\DashboardController</default>
     </route>
 
+    <route id="teebb_sbadmin2_search" path="/search">
+        <default key="_controller">Teebb\SBAdmin2Bundle\Controller\SearchController</default>
+    </route>
 
 </routes>
