@@ -74,6 +74,10 @@ final class BreadcrumbsBuilder implements BreadcrumbsBuilderInterface
         ItemInterface $menu = null
     ): ItemInterface {
         if (!$menu) {
+            if ($admin->isChild())
+            {
+                $admin = $admin->getParent();
+            }
             $menu = $admin->getMenuFactory()->createItem('root');
 
             $menu = $menu->addChild(
@@ -96,7 +100,7 @@ final class BreadcrumbsBuilder implements BreadcrumbsBuilderInterface
                 null,
             ]
         );
-
+        /**@var AdminInterface $childAdmin**/
         $childAdmin = $admin->getCurrentChildAdmin();
 
         if ($childAdmin) {

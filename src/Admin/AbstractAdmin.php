@@ -248,7 +248,7 @@ class AbstractAdmin implements AdminInterface
 
     }
 
-    public function getAdminServiceId()
+    public function getAdminServiceId(): string
     {
         return $this->adminServiceId;
     }
@@ -729,6 +729,7 @@ class AbstractAdmin implements AdminInterface
     public function getCurrentChildAdmin()
     {
         foreach ($this->children as $children) {
+
             if ($children->getBoolCurrentChild()) {
                 return $children;
             }
@@ -997,6 +998,22 @@ class AbstractAdmin implements AdminInterface
         return $this->objectManager->find($this->entity, $id);
     }
 
+    public function getModelInstance($class)
+    {
+        $r = new \ReflectionClass($class);
+        if ($r->isAbstract()) {
+            throw new \RuntimeException(sprintf('Cannot initialize abstract class: %s', $class));
+        }
+
+        $constructor = $r->getConstructor();
+
+        if (null !== $constructor && (!$constructor->isPublic() || $constructor->getNumberOfRequiredParameters() > 0)) {
+            return $r->newInstanceWithoutConstructor();
+        }
+
+        return new $class();
+    }
+
     /**
      * @return array
      */
@@ -1027,6 +1044,14 @@ class AbstractAdmin implements AdminInterface
     public function setListActionType(string $listActionType): void
     {
         $this->listActionType = $listActionType;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getMapProperties(): ?array
+    {
+        return $this->mapProperties;
     }
 
     public function getForm(string $action): FormInterface
@@ -1063,7 +1088,7 @@ class AbstractAdmin implements AdminInterface
 
         $identifiers = [];
 
-        foreach ($metaData->getIdentifierValues($object) as $name => $value)
+        foreach ($metaData->getIdentifierValues($object) as $idName => $value)
         {
             if (!\is_object($value)) {
                 $identifiers[] = $value;
@@ -1077,7 +1102,7 @@ class AbstractAdmin implements AdminInterface
                 continue;
             }
 
-            $fieldType = $metaData->getTypeOfField($name);
+            $fieldType = $metaData->getTypeOfField($idName);
             $type = $fieldType && Type::hasType($fieldType) ? Type::getType($fieldType) : null;
             if ($type) {
                 $identifiers[] = $type->convertToDatabaseValue($value, $platform);

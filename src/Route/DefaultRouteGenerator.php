@@ -58,7 +58,8 @@ class DefaultRouteGenerator implements RouteGeneratorInterface
         $name,
         array $parameters = [],
         $absolute = UrlGeneratorInterface::ABSOLUTE_PATH
-    ) {
+    )
+    {
         $arrayRoute = $this->generateMenuUrl($admin, $name, $parameters, $absolute);
 
         return $this->router->generate($arrayRoute['route'], $arrayRoute['routeParameters'], $arrayRoute['routeAbsolute']);
@@ -69,20 +70,22 @@ class DefaultRouteGenerator implements RouteGeneratorInterface
         $name,
         array $parameters = [],
         $absolute = UrlGeneratorInterface::ABSOLUTE_PATH
-    ) {
-
+    )
+    {
         // if the admin is a child we automatically append the parent's id
-        if ($admin->isChild() && $admin->hasRequest()) {
+        if ($admin->isChild() && $admin->getParent()->hasRequest()) {
             // twig template does not accept variable hash key ... so cannot use admin.idparameter ...
             // switch value
+
             if (isset($parameters['id'])) {
                 $parameters[$admin->getIdParameter()] = $parameters['id'];
                 unset($parameters['id']);
             }
 
             for ($parentAdmin = $admin->getParent(); null !== $parentAdmin; $parentAdmin = $parentAdmin->getParent()) {
-                $parameters[$parentAdmin->getIdParameter()] = $admin->getRequest()->attributes->get($parentAdmin->getIdParameter());
+                $parameters[$parentAdmin->getIdParameter()] = $admin->getParent()->getRequest()->attributes->get($parentAdmin->getIdParameter());
             }
+    
         }
 
         $code = $this->getCode($admin, $name);
@@ -116,10 +119,10 @@ class DefaultRouteGenerator implements RouteGeneratorInterface
 
         // someone provide a code, so it is a child
         if (strpos($name, '.')) {
-            return $codePrefix.'|'.$name;
+            return $codePrefix . '|' . $name;
         }
 
-        return $codePrefix.'.'.$name;
+        return $codePrefix . '.' . $name;
     }
 
     private function loadCache(AdminInterface $admin): void

@@ -10,6 +10,7 @@ use Symfony\Component\Form\FormRegistryInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface as RoutingUrlGeneratorInterface;
 use Teebb\SBAdmin2Bundle\Exception\PropertyNotExistException;
 use Teebb\SBAdmin2Bundle\Route\RouteBuilderInterface;
 use Teebb\SBAdmin2Bundle\Route\RouteCollection;
@@ -22,7 +23,7 @@ interface AdminInterface extends ParentAdminInterface
 
     public function addChild(AdminInterface $child, string $property);
 
-    public function getAdminServiceId();
+    public function getAdminServiceId(): string;
 
     /**
      * @return AdminInterface|null
@@ -105,6 +106,8 @@ interface AdminInterface extends ParentAdminInterface
 
     public function generateMenuUrl($name, array $parameters = [], $absolute = UrlGeneratorInterface::ABSOLUTE_PATH);
 
+    public function generateObjectUrl($name, $object, array $parameters = [], $absolute = RoutingUrlGeneratorInterface::ABSOLUTE_PATH);
+
     public function setRouteGenerator(RouteGeneratorInterface $routeGenerator);
 
     /**
@@ -154,6 +157,8 @@ interface AdminInterface extends ParentAdminInterface
 
     public function getCurrentChildAdmin();
 
+    public function getModelInstance($class);
+
     public function getBoolCurrentChild();
 
     public function setBoolCurrentChild(bool $boolCurrentChild);
@@ -177,6 +182,8 @@ interface AdminInterface extends ParentAdminInterface
     public function getPropertyAccessor(): PropertyAccessorInterface;
 
     public function setPropertyAccessor(PropertyAccessorInterface $propertyAccessor): void;
+
+    public function getMapProperties(): ?array;
 
     public function checkAccess($action, $object = null);
 

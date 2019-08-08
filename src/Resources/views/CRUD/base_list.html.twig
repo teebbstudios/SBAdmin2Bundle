@@ -1,1 +1,26 @@
 {% extends '@TeebbSBAdmin2/standard_layout.html.twig' %}
+
+{% if app.request.attributes.get('_route') == 'teebb_sbadmin2_search' %}
+    {% set searchOption = teebb_sbadmin2.sbadmin2Config.getOption('search') %}
+    {% set keywords = filterParameters[searchOption['property'][0]] %}
+    {% set actionLabel = 'Search \'%keywords%\' Results'|trans({'%keywords%': keywords}, teebb_sbadmin2.transDomain) %}
+{% else %}
+    {% set actionLabel = action|trans({}, teebb_sbadmin2.transDomain) %}
+{% endif %}
+
+{% block teebb_head_title %}
+    {{ admin.label|trans({}, teebb_sbadmin2.transDomain) ~ ' ' ~ actionLabel ~ ' | ' ~ 'TeebbSBAdmin2'  |trans({}, teebb_sbadmin2.transDomain) }}
+{% endblock %}
+
+{% block heading_label %}
+    {{ admin.label|trans({}, teebb_sbadmin2.transDomain) ~ ' Manage'|trans({}, teebb_sbadmin2.transDomain) }}
+{% endblock %}
+
+{% block heading_link %}
+    {% if admin is not defined or admin.isChild() == false %}
+        <a href="{{ admin.generateUrl('create') }}" class="btn btn-sm btn-primary shadow-sm">
+            <i class="fas fa-plus-circle fa-sm text-white-50 pr-2"></i>
+            {{ 'Create'|trans({}, teebb_sbadmin2.transDomain) ~' '~admin.label|trans({}, teebb_sbadmin2.transDomain) }}
+        </a>
+    {% endif %}
+{% endblock %}

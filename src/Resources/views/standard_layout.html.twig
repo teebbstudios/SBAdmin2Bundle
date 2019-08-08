@@ -128,6 +128,7 @@
                                         {% if _breadcrumb is empty %}
                                             {% if action is defined %}
                                                 {% for menu in teebb_sbadmin2.breadcrumbsBuilder.breadcrumbs(admin, action) %}
+
                                                     {%- set translation_domain = menu.extra('translation_domain', 'messages') -%}
 
                                                     {%- set label = menu.label -%}
@@ -165,8 +166,8 @@
                                     <nav aria-label="breadcrumb" class="d-none d-md-block">
                                         <ol class="breadcrumb">
                                             <li class="breadcrumb-item">
-                                                <a href="{{ path('teebb_sbadmin2_dashboard') }}"><i class="fas fa-home"></i></a>
-                                            </li>
+                                                <a href="{{ path('teebb_sbadmin2_dashboard') }}"><i class="fas fa-home"></i> {{ 'Dashboard'|trans({}, teebb_sbadmin2.transDomain) }}</a>
+                                            </li
                                         </ol>
                                     </nav>
                                 {% endif %}
@@ -337,7 +338,6 @@
                 {% block teebb_page_content %}
                     <!-- Begin Page Content -->
                     <div class="container-fluid">
-
                         {% block teebb_content_heading %}
                             <!-- Page Heading -->
                             <div class="d-sm-flex align-items-center justify-content-between mb-4">

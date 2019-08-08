@@ -16,7 +16,8 @@
         {% endif %}
         {% if admin.hasRoute('delete') and admin.hasAccess('delete', object) %}
             {{ 'Or'|trans({}, teebb_sbadmin2.transDomain) }}
-            <a href="{{ path(admin.routes.getRouteName('delete'), {'id': object.id}) }}" class="btn btn-danger btn-sm shadow-sm">
+
+            <a href="{{ admin.generateObjectUrl('delete',object,{'id': object.id}) }}" class="btn btn-danger btn-sm shadow-sm">
                 <i class="fas fa-save fa-sm text-white-50 pr-2"></i>
                 {{ 'Delete'|trans({}, teebb_sbadmin2.transDomain) }}
             </a>

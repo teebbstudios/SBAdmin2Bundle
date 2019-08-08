@@ -26,7 +26,7 @@
             {% for property in list_item_properties %}
                 <td class="{{ property.class }}">
                     {%- if property['action'] is defined %}
-                        <a href="{{ path(admin.routes.getRouteName(property['action']), {'id': item.id }) }}">{{ admin.propertyAccessor.getValue(item, property.property) }}</a>
+                        <a href="{{ admin.generateObjectUrl(property['action'],item,{'id': item.id}) }}">{{ admin.propertyAccessor.getValue(item, property.property) }}</a>
                     {% else %}
                         {{ admin.propertyAccessor.getValue(item, property.property) }}
                     {% endif -%}
@@ -36,7 +36,7 @@
                 {% if admin.listActionType == 'item' %}
                     {% for action in list_item_actions %}
                         {% if is_granted(action['roles']) or action['roles'] is empty %}
-                            <a href="{{ path(admin.routes.getRouteName(action.name), {'id': item.id}) }}"
+                            <a href="{{ admin.generateObjectUrl(action.name,item,{'id': item.id}) }}"
                                class="btn btn-sm shadow-sm {{ action['class'] }}">
                                 <i class="fas {{ action['icon'] }} fa-sm text-white-50 pr-2"></i>{{ action['name']|upper|trans({}, teebb_sbadmin2.transDomain) }}
                             </a>
@@ -47,7 +47,7 @@
                         {% for action in list_item_actions %}
                             {% if is_granted(action['roles']) or action['roles'] is empty and action['hide'] == false %}
 
-                                <a href="{{ path(admin.routes.getRouteName(action.name), {'id': item.id}) }}"
+                                <a href="{{ admin.generateObjectUrl(action.name,item,{'id': item.id})  }}"
                                    class="btn btn-sm shadow-sm {{ action['class'] }}">
                                     <i class="fas {{ action['icon'] }} fa-sm text-white-50 pr-2"></i>{{ action['name']|upper|trans({}, teebb_sbadmin2.transDomain) }}
                                 </a>
@@ -63,7 +63,7 @@
                             <div class="dropdown-menu" aria-labelledby="btnGroupDrop_{{ item.id }}">
                                 {% for action in list_item_actions %}
                                     {% if is_granted(action['roles']) or action['roles'] is empty and action['hide'] == true %}
-                                        <a href="{{ path(admin.routes.getRouteName(action.name), {'id': item.id}) }}" class="dropdown-item">
+                                        <a href="{{ admin.generateObjectUrl(action.name,item,{'id': item.id}) }}" class="dropdown-item">
                                             <i class="fas {{ action['icon'] }} fa-sm pr-2"></i>{{ action['name']|upper|trans({}, teebb_sbadmin2.transDomain) }}
                                         </a>
                                     {% endif %}

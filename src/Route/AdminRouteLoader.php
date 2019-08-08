@@ -57,6 +57,7 @@ class AdminRouteLoader extends Loader
     public function load($resource, $type = null)
     {
         $collection = new SymfonyRouteCollection();
+
         foreach ($this->adminServiceIds as $id) {
             $admin = $this->config->getInstance($id);
 

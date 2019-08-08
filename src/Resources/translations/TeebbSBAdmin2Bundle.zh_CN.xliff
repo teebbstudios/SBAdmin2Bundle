@@ -118,13 +118,17 @@
                 <source>successfully updated!</source>
                 <target>已成功更新！</target>
             </trans-unit>
-            <trans-unit id="Confirm deletion?">
-                <source>Confirm deletion?</source>
-                <target>确认要删除吗？</target>
+            <trans-unit id="successfully deleted!">
+                <source>successfully deleted!</source>
+                <target>已成功删除！</target>
             </trans-unit>
-            <trans-unit id="Delete the selected data? Data related to it will also be deleted. Please confirm!">
-                <source>Delete the selected data? Data related to it will also be deleted. Please confirm!</source>
-                <target>确认要删除选定数据吗？与之相关的数据也会一并删除，请确认!</target>
+            <trans-unit id="Confirm deletion %subject%?">
+                <source>Confirm deletion %subject%?</source>
+                <target>确认要删除'%subject%'吗？</target>
+            </trans-unit>
+            <trans-unit id="Delete the '%subject%'? Data related to it will also be deleted. Please confirm!">
+                <source>Delete the '%subject%'? Data related to it will also be deleted. Please confirm!</source>
+                <target>确认要删除'%subject%'吗？与之相关的数据也会一并删除，请确认!</target>
             </trans-unit>
             <trans-unit id="Yes,delete it!">
                 <source>Yes,delete it!</source>

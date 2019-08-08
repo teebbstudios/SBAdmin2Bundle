@@ -1,42 +1,35 @@
 {% extends '@TeebbSBAdmin2/CRUD/base_list.html.twig' %}
 
 {% block teebb_head_title %}
-    {{ admin.label|trans({}, teebb_sbadmin2.transDomain) ~ ' Batch '|trans({}, teebb_sbadmin2.transDomain) ~ action ~ ' | ' ~ 'TeebbSBAdmin2'  |trans({}, teebb_sbadmin2.transDomain) }}
+    {{ admin.label|trans({}, teebb_sbadmin2.transDomain) ~ ' Batch '|trans({}, teebb_sbadmin2.transDomain) ~ actionLabel ~ ' | ' ~ 'TeebbSBAdmin2'  |trans({}, teebb_sbadmin2.transDomain) }}
 {% endblock %}
 
 {% block heading_label %}
-    {{ admin.label|trans({}, teebb_sbadmin2.transDomain) ~ ' Batch '|trans({}, teebb_sbadmin2.transDomain) ~ action }}
-{% endblock %}
-
-{% block heading_link %}
-    <a href="{{ path(admin.routes.getRouteName('create')) }}" class="btn btn-sm btn-primary shadow-sm">
-        <i class="fas fa-plus-circle fa-sm text-white-50 pr-2"></i>
-        {{ 'Create'|trans({}, teebb_sbadmin2.transDomain) ~' '~admin.label|trans({}, teebb_sbadmin2.transDomain) }}
-    </a>
+    {{ admin.label|trans({}, teebb_sbadmin2.transDomain) ~ ' Batch '|trans({}, teebb_sbadmin2.transDomain) ~ actionLabel }}
 {% endblock %}
 
 {% block content %}
     <!--Batch -->
     <div class="card border-top-danger shadow mb-4">
         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">{{ 'Confirm batch action %action%?' |trans({'%action%': action}, teebb_sbadmin2.transDomain) }}</h6>
+            <h6 class="m-0 font-weight-bold text-primary">{{ 'Confirm batch action %action%?' |trans({'%action%': actionLabel}, teebb_sbadmin2.transDomain) }}</h6>
         </div>
-        <form action="{{ path(admin.routes.getRouteName('batch'),{'filter': app.request.query.get('filter') }) }}" method="post">
+        <form action="{{ admin.generateUrl('batch',{'filter': app.request.query.get('filter') }) }}" method="post">
             <input type="hidden" name="confirmation" value="ok">
             <input type="hidden" name="data" value="{{ data|json_encode }}">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token('teebb.batch') }}">
 
             <div class="card-body">
-                {{ '%action% the selected data? Data related to it will also be %actioned%. Please confirm!' |trans({'%action%': action, '%actioned%': action|lower}, teebb_sbadmin2.transDomain) }}
+                {{ '%action% the selected data? Data related to it will also be %actioned%. Please confirm!' |trans({'%action%': actionLabel, '%actioned%': actionLabel|lower}, teebb_sbadmin2.transDomain) }}
             </div>
             <div class="card-footer">
                 <button class="btn btn-danger btn-sm shadow-sm">
                     <i class="fas fa-trash fa-sm text-white-50 pr-2"></i>
-                    {{ 'Yes.%action% it!'|trans({'%action%': action}, teebb_sbadmin2.transDomain) }}
+                    {{ 'Yes.%action% it!'|trans({'%action%': actionLabel}, teebb_sbadmin2.transDomain) }}
                 </button>
                 {% if admin.hasRoute('list') and admin.hasAccess('list') %}
                     {{ 'Or'|trans({}, teebb_sbadmin2.transDomain) }}
-                    <a href="{{ path(admin.routes.getRouteName('list')) }}" class="btn btn-primary btn-sm shadow-sm">
+                    <a href="{{ admin.generateUrl('list', {'filter': app.request.query.get('filter')}) }}" class="btn btn-primary btn-sm shadow-sm">
                         <i class="fas fa-list fa-sm text-white-50 pr-2"></i>
                         {{ 'Return to list'|trans({}, teebb_sbadmin2.transDomain) }}
                     </a>

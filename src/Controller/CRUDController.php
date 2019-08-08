@@ -8,7 +8,9 @@ use Doctrine\ORM\Query;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -79,6 +81,19 @@ class CRUDController extends AbstractFOSRestController
         $this->paginator = $this->container->get('knp_paginator');
     }
 
+    public function checkParentAdminObjectExistAndSetSubject(Request $request)
+    {
+        $parentAdmin = $this->admin->getParent();
+
+        $parentObjectId = $request->get($parentAdmin->getIdParameter());
+
+        if (($parentObject = $parentAdmin->getEntityObject($parentObjectId)) === null) {
+            throw new NotFoundHttpException(sprintf('The parent object id %s doesn\'t exist.', $parentObjectId));
+        }
+
+        $parentAdmin->setSubject($parentObject);
+    }
+
     public function listAction(Request $request)
     {
         $this->admin->checkAccess('list');
@@ -90,6 +105,26 @@ class CRUDController extends AbstractFOSRestController
         $filterProperties = $this->admin->getAccessFilterProperties();
 
         $filterParameters = $request->get('filter') ?? [];
+
+        if ($this->admin->isChild()) {
+
+            $parentAdmin = $this->admin->getParent();
+
+            $parentObjectId = $request->get($parentAdmin->getIdParameter());
+
+            if (($parentObject = $parentAdmin->getEntityObject($parentObjectId)) === null) {
+                throw new NotFoundHttpException(sprintf('The parent object id %s doesn\'t exist.', $parentObjectId));
+            }
+
+            $parentAdmin->setSubject($parentObject);
+
+            $mapProperties = $parentAdmin->getMapProperties();
+
+            $childrenPropertyName = $mapProperties[$parentAdmin->getAdminServiceId()];
+
+            $filterParameters = array_merge($filterParameters, [$childrenPropertyName => $parentObjectId]);
+        }
+
         $orderBy = ['id' => 'DESC'];
 
         $pagination = $this->paginator->paginate(
@@ -130,6 +165,7 @@ class CRUDController extends AbstractFOSRestController
 
     public function editAction(Request $request)
     {
+
         $id = $request->get($this->admin->getIdParameter());
 
         $object = $this->admin->getEntityObject($id);
@@ -139,6 +175,12 @@ class CRUDController extends AbstractFOSRestController
         }
 
         $this->admin->checkAccess('edit', $object);
+
+        if ($this->admin->isChild()) {
+            $this->checkParentAdminObjectExistAndSetSubject($request);
+        }
+
+        $this->admin->setSubject($object);
 
         $editForm = $this->admin->getForm('edit');
 
@@ -150,6 +192,8 @@ class CRUDController extends AbstractFOSRestController
 
             $objectData = $editForm->getData();
 
+            $this->admin->setSubject($objectData);
+
             $em = $this->admin->getObjectManager();
 
             $em->persist($objectData);
@@ -158,6 +202,12 @@ class CRUDController extends AbstractFOSRestController
             $this->addFlash('success', sprintf('successfully updated!'));
 
             if (key_exists('button-to-list', $request->request->all())) {
+
+                if ($this->admin->isChild()) {
+                    $parentId = $request->get($this->admin->getParent()->getIdParameter());
+                    return $this->redirectToRoute($this->admin->getRoutes()->getRouteName('list'), ['id' => $parentId]);
+                }
+
                 return $this->redirectToRoute($this->admin->getRoutes()->getRouteName('list'));
             }
         }
@@ -175,6 +225,10 @@ class CRUDController extends AbstractFOSRestController
     {
         $this->admin->checkAccess('create');
 
+        if ($this->admin->isChild()) {
+            $this->checkParentAdminObjectExistAndSetSubject($request);
+        }
+
         $createForm = $this->admin->getForm('create');
 
         $createForm->handleRequest($request);
@@ -182,6 +236,8 @@ class CRUDController extends AbstractFOSRestController
         if ($createForm->isSubmitted() && $createForm->isValid()) {
 
             $objectData = $createForm->getData();
+
+            $this->admin->setSubject($objectData);
 
             $em = $this->admin->getObjectManager();
 
@@ -191,8 +247,20 @@ class CRUDController extends AbstractFOSRestController
             $this->addFlash('success', sprintf('successfully created!'));
 
             if (key_exists('button-to-list', $request->request->all())) {
+
+                if ($this->admin->isChild()) {
+                    $parentId = $request->get($this->admin->getParent()->getIdParameter());
+                    return $this->redirectToRoute($this->admin->getRoutes()->getRouteName('list'), ['id' => $parentId]);
+                }
+
                 return $this->redirectToRoute($this->admin->getRoutes()->getRouteName('list'));
             } elseif (key_exists('button-to-new', $request->request->all())) {
+
+                if ($this->admin->isChild()) {
+                    $parentId = $request->get($this->admin->getParent()->getIdParameter());
+                    return $this->redirectToRoute($this->admin->getRoutes()->getRouteName('create'), ['id' => $parentId], 301);
+                }
+
                 return $this->redirectToRoute($this->admin->getRoutes()->getRouteName('create'), [], 301);
             }
 
@@ -218,16 +286,29 @@ class CRUDController extends AbstractFOSRestController
 
         $this->admin->checkAccess('delete', $object);
 
+        $this->admin->setSubject($object);
+
+        if ($this->admin->isChild()) {
+            $this->checkParentAdminObjectExistAndSetSubject($request);
+        }
+
         if ('DELETE' === $request->getMethod()) {
             if ($this->isCsrfTokenValid('teebb.delete', $request->get('_csrf_token'))) {
 
                 $em = $this->admin->getObjectManager();
 
+                $this->admin->setSubject($object);
+
                 $em->remove($object);
 
                 $em->flush();
 
-                $this->addFlash('success', sprintf('successfully delete!'));
+                $this->addFlash('success', sprintf('successfully deleted!'));
+
+                if ($this->admin->isChild()) {
+                    $parentId = $request->get($this->admin->getParent()->getIdParameter());
+                    return $this->redirectToRoute($this->admin->getRoutes()->getRouteName('list'), ['id' => $parentId]);
+                }
 
                 return $this->redirectToRoute($this->admin->getRoutes()->getRouteName('list'));
             }
@@ -252,6 +333,11 @@ class CRUDController extends AbstractFOSRestController
         if (!$this->isCsrfTokenValid('teebb.batch', $request->request->get('_csrf_token'))) {
             throw new HttpException(400, 'The csrf token is not valid, CSRF attack?');
         } else {
+
+            if ($this->admin->isChild()) {
+                $this->checkParentAdminObjectExistAndSetSubject($request);
+            }
+
             $confirmation = $request->get('confirmation', false);
 
             if ($data = json_decode((string)$request->get('data'), true)) {
@@ -302,7 +388,7 @@ class CRUDController extends AbstractFOSRestController
                 $template = $this->templateRegistry->getTemplate('batch_confirmation');
 
                 return $this->render($template, [
-                    'action' => $this->container->get('translator')->trans($camelizedAction, [], 'TeebbSBAdmin2Bundle'),
+                    'action' => $camelizedAction,//$this->container->get('translator')->trans($camelizedAction, [], 'TeebbSBAdmin2Bundle'),
                     'admin' => $this->admin,
                     'data' => $data,
                 ]);
@@ -363,6 +449,11 @@ class CRUDController extends AbstractFOSRestController
         }
 
         $this->addFlash('success', 'Selected items have been successfully deleted.');
+
+        if ($this->admin->isChild()) {
+            $parentId = $request->get($this->admin->getParent()->getIdParameter());
+            return $this->redirectToRoute($this->admin->getRoutes()->getRouteName('list'), ['id' => $parentId, 'filter' => $request->query->get('filter')]);
+        }
 
         return $this->redirectToRoute($this->admin->getRoutes()->getRouteName('list'), ['filter' => $request->query->get('filter')]);
     }

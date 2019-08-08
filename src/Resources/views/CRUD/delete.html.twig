@@ -1,32 +1,17 @@
 {% extends '@TeebbSBAdmin2/CRUD/base_list.html.twig' %}
 
-{% block teebb_head_title %}
-    {{ admin.label|trans({}, teebb_sbadmin2.transDomain) ~ ' ' ~ action|trans({}, teebb_sbadmin2.transDomain) ~ ' | ' ~ 'TeebbSBAdmin2'  |trans({}, teebb_sbadmin2.transDomain) }}
-{% endblock %}
-
-{% block heading_label %}
-    {{ admin.label|trans({}, teebb_sbadmin2.transDomain) ~ ' ' ~ action |trans({}, teebb_sbadmin2.transDomain) }}
-{% endblock %}
-
-{% block heading_link %}
-    <a href="{{ path(admin.routes.getRouteName('create')) }}" class="btn btn-sm btn-primary shadow-sm">
-        <i class="fas fa-plus-circle fa-sm text-white-50 pr-2"></i>
-        {{ 'Create'|trans({}, teebb_sbadmin2.transDomain) ~' '~admin.label|trans({}, teebb_sbadmin2.transDomain) }}
-    </a>
-{% endblock %}
-
 {% block content %}
     <!--List Contents-->
     <div class="card border-top-danger shadow mb-4">
         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-            <h6 class="m-0 font-weight-bold text-primary">{{ 'Confirm deletion?' |trans({}, teebb_sbadmin2.transDomain) }}</h6>
+            <h6 class="m-0 font-weight-bold text-primary">{{ 'Confirm deletion %subject%?' |trans({'%subject%': admin.toString(admin.subject) }, teebb_sbadmin2.transDomain) }}</h6>
         </div>
         <form method="post">
             <input type="hidden" name="_method" value="DELETE">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token('teebb.delete') }}">
 
             <div class="card-body">
-                {{ 'Delete the selected data? Data related to it will also be deleted. Please confirm!' |trans({}, teebb_sbadmin2.transDomain) }}
+                {{ 'Delete the \'%subject%\'? Data related to it will also be deleted. Please confirm!' |trans({'%subject%': admin.toString(admin.subject) }, teebb_sbadmin2.transDomain) }}
             </div>
             <div class="card-footer">
                 <button class="btn btn-danger btn-sm shadow-sm">
@@ -35,7 +20,7 @@
                 </button>
                 {% if admin.hasRoute('edit') and admin.hasAccess('edit', object) %}
                     {{ 'Or'|trans({}, teebb_sbadmin2.transDomain) }}
-                    <a href="{{ path(admin.routes.getRouteName('edit'), {'id': object.id}) }}" class="btn btn-primary btn-sm shadow-sm">
+                    <a href="{{ admin.generateObjectUrl('edit',object,{'id': object.id}) }}" class="btn btn-primary btn-sm shadow-sm">
                         <i class="fas fa-pen fa-sm text-white-50 pr-2"></i>
                         {{ 'Edit'|trans({}, teebb_sbadmin2.transDomain) }}
                     </a>
