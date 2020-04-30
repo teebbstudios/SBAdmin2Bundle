@@ -38,7 +38,7 @@
         "datatables.net-bs4": "1.10.19",
         "dropzone": "^5.5.1",
         "file-saver": "^2.0.2",
-        "jquery": "3.4.1",
+        "jquery": "3.5.0",
         "jquery.easing": "^1.4.1",
         "nan": "^2.14.0",
         "nestable": "^0.2.0",
